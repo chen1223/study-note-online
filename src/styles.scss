@@ -11,6 +11,12 @@ body {
   margin: 0;
   position: relative;
 }
+/** Page wrapper **/
+.page-wrapper {
+  padding: 1em 2em;
+  background: $bgColor;
+  min-height: calc(100% - #{$headerHeight});
+}
 .inner-wrapper {
   margin: auto;
   max-width: 1300px;

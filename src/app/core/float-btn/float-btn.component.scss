@@ -13,9 +13,9 @@
   padding: 0;
   margin: 0;
   position: relative;
-  // overflow: hidden;
+  animation: .1s .3s hide-btns forwards;
   &.shown {
-    // overflow: visible;
+    animation: .01s show-btns forwards;
     .action-btn {
       z-index: 1000;
       opacity: 1;
@@ -45,6 +45,8 @@
     opacity: 0;
     .link {
       margin: auto;
+      color: currentColor;
+      text-decoration: none;
     }
     &:hover {
       color: $white;
@@ -57,5 +59,21 @@
       right: -1em;
       bottom: -3em;
     }
+  }
+}
+@keyframes hide-btns {
+  0% {
+    overflow: visible;
+  }
+  100% {
+    overflow: hidden;
+  }
+}
+@keyframes show-btns {
+  0% {
+    overflow: hidden;
+  }
+  100% {
+    overflow: visible;
   }
 }

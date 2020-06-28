@@ -1,7 +1,7 @@
 @import '../../share/variable.scss';
 
 .header {
-  height: 80px;
+  height: $headerHeight;
   background: linear-gradient(to bottom right, $red 20%, $orange 100%);
   padding: 1em 2em;
   display: flex;
