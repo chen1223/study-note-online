@@ -1,1 +1,44 @@
-/* You can add global styles to this file, and also import other style files */
+@import 'https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap';
+@import './app/share/variable.scss';
+* {
+  font-family: 'Montserrat', sans-serif;
+  box-sizing: border-box;
+}
+html, body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  position: relative;
+}
+.inner-wrapper {
+  margin: auto;
+  max-width: 1300px;
+  padding: 1em 2em;
+}
+/** Round button styling **/
+button {
+  outline: none;
+  cursor: pointer;
+}
+.main-btn {
+  border-radius: 5px;
+  color: $white;
+  border: none;
+  background: linear-gradient(to bottom left, $orange 0%, $red 70%);
+  cursor: pointer;
+}
+.sub-btn {
+  background: $red;
+  opacity: .5;
+  &:hover {
+    opacity: 1;
+  }
+}
+.round-btn {
+  border-radius: 50%;
+  border: none;
+  width: 40px;
+  height: 40px;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.18);
+}

@@ -1,0 +1,40 @@
+<header class="header"
+        [ngClass]="{
+          'opened': isActive
+        }">
+  <div class="brand-wrapper">
+    <fa-icon class="brand __icon" [icon]="['fa', 'graduation-cap']" aria-label="graduation cap"></fa-icon>
+    <span class="brand __title">My study note online</span>
+  </div>
+  <div class="menu-wrapper">
+    <ul class="menu">
+      <li class="item --search">
+        <!-- Search box -->
+        <div class="search-box action-item">
+          <fa-icon class="search __icon" [icon]="['fa', 'search']" aria-label="search"></fa-icon>
+          <input type="text" class="search __input">
+        </div><!-- End of search box -->
+      </li>
+      <li class="item"><a routerLink="/" class="link __home action-item">Home</a></li>
+      <li class="item">
+        <ng-container *ngIf="isLogin;else loginBtn">
+          <a routerLink="/profile" class="link __login action-item">Profile</a>
+        </ng-container>
+        <ng-template #loginBtn>
+          <button class="action-item __login" type="button" aria-label="Login / Sign up">Login / Signup</button>
+        </ng-template>
+      </li>
+    </ul>
+  </div>
+  <button
+    class="hamburger hamburger--slider"
+    type="button"
+    (click)="toggleMenu()"
+    [ngClass]="{
+      'is-active': isActive
+    }">
+    <span class="hamburger-box">
+      <span class="hamburger-inner"></span>
+    </span>
+  </button>
+</header>

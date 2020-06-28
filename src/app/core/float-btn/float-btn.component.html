@@ -1,0 +1,23 @@
+<!-- Action box -->
+<div class="action-box">
+  <ul class="action-list"
+      [ngClass]="{
+        'shown': isOpen
+      }">
+    <li class="action-btn round-btn --vocab">
+      <a routerLink="/vocab/new" class="link" aria-label="new vocab">Vocab</a>
+    </li>
+    <li class="action-btn round-btn --note">
+      <a routerLink="/vocab/note" class="link" aria-label="new note">Note</a>
+    </li>
+    <li class="action-btn round-btn --book">
+      <a routerLink="/vocab/book" class="link" aria-label="new book">Book</a>
+    </li>
+  </ul>
+  <button class="main-btn round-btn pen__btn"
+          type="button"
+          aria-label="edit"
+          (click)="toggleOpen()">
+    <fa-icon class="pen __icon" [icon]="['fa', 'pen']" aria-label="pen icon"></fa-icon>
+  </button>
+</div><!-- End of action box -->
