@@ -1,17 +1,33 @@
+import { MaterialModule } from './../../share/material.module';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { HeaderComponent } from './header.component';
+import { MatDialog } from '@angular/material/dialog';
+import { By } from '@angular/platform-browser';
+import { Component } from '@angular/core';
+import { of } from 'rxjs';
+
+@Component({
+  selector: 'app-login-dialog',
+  template: ''
+})
+export class MockLoginDialogComponent {}
 
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
+  let dialogRefSpyObj = jasmine.createSpyObj({ afterClosed : of({}), close: null });
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ HeaderComponent ],
+      declarations: [
+        HeaderComponent,
+        MockLoginDialogComponent
+      ],
       imports: [
-        FontAwesomeModule
+        FontAwesomeModule,
+        MaterialModule
       ]
     })
     .compileComponents();
@@ -37,5 +53,28 @@ describe('HeaderComponent', () => {
     component.toggleMenu();
     fixture.detectChanges();
     expect(component.isActive).toBeFalsy();
+  });
+
+  it('should define matDialog', () => {
+    expect(component.matDialog).toBeTruthy();
+    expect(component.matDialog).toBeInstanceOf(MatDialog);
+  });
+
+  // Login button related tests
+  it('should define openLoginDialog function', () => {
+    expect(component.openLoginDialog).toBeTruthy();
+  });
+  it('should call openLoginDialog on login / signup click', () => {
+    const el = (fixture.debugElement.query(By.css('.action-item.__login')).nativeElement) as HTMLButtonElement;
+    const fnc = spyOn(component, 'openLoginDialog').and.callFake(() => {});
+    el.click();
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should show dialog on openLoginDialog called', () => {
+    const fnc = spyOn(component.matDialog, 'open').and.returnValue(dialogRefSpyObj);
+    component.openLoginDialog();
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalled();
   });
 });

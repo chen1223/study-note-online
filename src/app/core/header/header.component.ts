@@ -1,3 +1,5 @@
+import { LoginDialogComponent } from './../login-dialog/login-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -9,12 +11,21 @@ export class HeaderComponent implements OnInit {
 
   isLogin = false;
   isActive = false;
-  constructor() { }
+  constructor(public readonly matDialog: MatDialog) { }
 
   ngOnInit(): void {
   }
 
   toggleMenu() {
     this.isActive = !this.isActive;
+  }
+
+  // On user clicks on login / signup
+  openLoginDialog(): void {
+    const dialogRef = this.matDialog.open(LoginDialogComponent, {
+      panelClass: 'login-panel',
+      width: '500px'
+    });
+    dialogRef.afterClosed().subscribe(result => {});
   }
 }

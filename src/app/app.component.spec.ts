@@ -1,8 +1,9 @@
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { TestBed, async } from '@angular/core/testing';
+import { TestBed, async, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 import { Component } from '@angular/core';
+import { By } from '@angular/platform-browser';
 
 /**
  * Mock Header Component
@@ -14,6 +15,16 @@ import { Component } from '@angular/core';
 export class MockHeaderComponent {}
 
 /**
+ * Mock Note modal component
+ */
+@Component({
+  // tslint:disable-next-line: component-selector
+  selector: 'note-modal',
+  template: ''
+})
+export class MockModalComponent {}
+
+/**
  * Mock Float buttom Component
  */
 @Component({
@@ -21,6 +32,8 @@ export class MockHeaderComponent {}
   template: ''
 })
 export class MockFloatBtnComponent {}
+let component: AppComponent;
+let fixture: ComponentFixture<AppComponent>;
 
 describe('AppComponent', () => {
   beforeEach(async(() => {
@@ -32,15 +45,22 @@ describe('AppComponent', () => {
       declarations: [
         AppComponent,
         MockHeaderComponent,
-        MockFloatBtnComponent
+        MockFloatBtnComponent,
+        MockModalComponent
       ],
     }).compileComponents();
+    fixture = TestBed.createComponent(AppComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
   }));
 
   it('should create the app', () => {
-    const fixture = TestBed.createComponent(AppComponent);
-    const app = fixture.componentInstance;
-    expect(app).toBeTruthy();
+    expect(component).toBeTruthy();
+  });
+
+  it('should have modal component defined in HTML', () => {
+    const modalComponent = fixture.debugElement.query(By.css('note-modal'));
+    expect(modalComponent).toBeTruthy();
   });
 
 });

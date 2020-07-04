@@ -8,7 +8,11 @@ import { library } from '@fortawesome/fontawesome-svg-core';
 import { faGraduationCap,
          faSearch,
          faPen } from '@fortawesome/free-solid-svg-icons';
+import { faFacebookSquare } from '@fortawesome/free-brands-svg-icons';
 import { ShareModule } from './share/share.module';
+import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 @NgModule({
   declarations: [
@@ -18,7 +22,9 @@ import { ShareModule } from './share/share.module';
     BrowserModule,
     AppRoutingModule,
     ShareModule,
-    CoreModule
+    CoreModule,
+    SweetAlert2Module.forRoot(),
+    BrowserAnimationsModule
   ],
   providers: [],
   bootstrap: [AppComponent]
@@ -27,7 +33,8 @@ export class AppModule {
   constructor() {
     [faGraduationCap,
      faSearch,
-     faPen].forEach(icon => {
+     faPen,
+     faFacebookSquare].forEach(icon => {
       library.add(icon);
     });
   }

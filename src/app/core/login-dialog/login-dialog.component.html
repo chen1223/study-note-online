@@ -1,0 +1,26 @@
+<!-- Dialog header -->
+<div class="dialog-header">
+  <h2 class="dialog-title">Login now to create your note</h2>
+</div><!-- End of dialog header -->
+<!-- Dialog Body -->
+<mat-dialog-content>
+  <div class="dialog-body">
+    <figure class="brand-icon">
+      <img class="__icon" src="/assets/img/cap.png">
+    </figure>
+    <div class="quote-wrapper">
+      <span class="quote">{{ selectedQuote.line }}</span>
+    </div><!-- End of quote wrapper -->
+    <div class="author-wrapper">
+      <span *ngIf="selectedQuote.author" class="author">{{ selectedQuote.author }}</span>
+    </div>
+    <button type="button"
+      aria-label="facebook"
+      class="fbBtn"
+      (click)="fbLogin()">
+      <i class="fab fa-facebook"></i>
+      <fa-icon class="fb__icon" [icon]="['fab', 'facebook-square']" aria-label="facebook icon"></fa-icon>
+      <span>Continue with Facebook</span>
+    </button>
+  </div><!-- End of dialog body -->
+</mat-dialog-content>

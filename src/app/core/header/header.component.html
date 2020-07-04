@@ -22,7 +22,7 @@
             <a routerLink="/profile" class="link __login action-item">Profile</a>
           </ng-container>
           <ng-template #loginBtn>
-            <button class="action-item __login" type="button" aria-label="Login / Sign up">Login / Signup</button>
+            <button (click)="openLoginDialog()" class="action-item __login" type="button" aria-label="Login / Sign up">Login / Signup</button>
           </ng-template>
         </li>
       </ul>

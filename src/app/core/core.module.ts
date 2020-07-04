@@ -5,6 +5,8 @@ import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FloatBtnComponent } from './float-btn/float-btn.component';
 import { HomeComponent } from './home/home.component';
+import { MaterialModule } from '../share/material.module';
+import { LoginDialogComponent } from './login-dialog/login-dialog.component';
 
 
 
@@ -12,16 +14,21 @@ import { HomeComponent } from './home/home.component';
   declarations: [
     HeaderComponent,
     FloatBtnComponent,
-    HomeComponent
+    HomeComponent,
+    LoginDialogComponent
   ],
   imports: [
     CommonModule,
     CoreRoutingModule,
-    ShareModule
+    ShareModule,
+    MaterialModule
   ],
   exports: [
     HeaderComponent,
     FloatBtnComponent
+  ],
+  entryComponents: [
+    LoginDialogComponent
   ]
 })
 export class CoreModule { }

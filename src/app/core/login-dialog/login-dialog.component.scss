@@ -1,0 +1,81 @@
+@import '../../share/variable.scss';
+
+.dialog-header,
+.dialog-body {
+  padding: 1.5em 2em;
+}
+.dialog-header {
+  background: $gradientBg;
+  text-align: center;
+}
+.dialog-header .dialog-title {
+  margin: 0;
+  color: $white;
+  font-weight: 600;
+  font-size: 1.4em;
+}
+.brand-icon {
+  text-align: center;
+  .__icon {
+    width: 6em;
+    max-width: 6em;
+  }
+}
+.quote-wrapper,
+.author-wrapper {
+  font-weight: 600;
+  color: $black;
+  opacity: .9;
+}
+.quote-wrapper {
+  width: 80%;
+  margin: 0 auto;
+  margin-top: 3em;
+  text-align: left;
+}
+.author-wrapper {
+  text-align: right;
+  width: 80%;
+  margin: 0 auto;
+  margin-top: .5em;
+  margin-bottom: 3em;
+}
+.author {
+  position: relative;
+  margin-left: 1.5em;
+  &:before {
+    content: ' — ';
+    position: absolute;
+    left: -1.5em;
+  }
+}
+
+button.fbBtn {
+  margin: 2em auto;
+  margin-bottom: 1em;
+  display: flex;
+  background: #4267b2;
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  padding: .5em 1em;
+  font-size: 14px;
+  cursor: pointer;
+  .fb__icon {
+    font-size: 1.2em;
+  }
+  span{
+    margin: auto;
+    margin-left: .5em;
+    font-size: 1em;
+  }
+}
+::ng-deep {
+  .login-panel {
+    .mat-dialog-container {
+      padding: 0;
+      background: $bgColor;
+      overflow-x: hidden;
+    }
+  }
+}
