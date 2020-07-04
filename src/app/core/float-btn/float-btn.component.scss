@@ -50,7 +50,7 @@
     }
     &:hover {
       color: $white;
-      background: linear-gradient(to bottom left, $orange 0%, $red 70%);
+      background: $gradientBg;
     }
     &.--vocab,
     &.--note,

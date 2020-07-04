@@ -13,9 +13,13 @@ body {
 }
 /** Page wrapper **/
 .page-wrapper {
-  padding: 1em 2em;
   background: $bgColor;
   min-height: calc(100% - #{$headerHeight});
+}
+.page-inner-wrapper {
+  padding: 1em 2em;
+  max-width: 1400px;
+  margin: auto;
 }
 .inner-wrapper {
   margin: auto;
@@ -31,7 +35,7 @@ button {
   border-radius: 5px;
   color: $white;
   border: none;
-  background: linear-gradient(to bottom left, $orange 0%, $red 70%);
+  background: linear-gradient(45deg, $red 20%, $orange 100%);
   cursor: pointer;
 }
 .sub-btn {
@@ -47,4 +51,23 @@ button {
   width: 40px;
   height: 40px;
   box-shadow: 2px 2px 6px rgba(0,0,0,0.18);
+}
+@media (min-width: 1400px) {
+  .page-inner-wrapper {
+    padding: 0;
+  }
+}
+@media (orientation: landscape) {
+  @media (min-width: 960px) {
+    body {
+      font-size: 14px;
+    }
+  }
+}
+@media (orientation: portrait) {
+  @media (min-width: 960px) {
+    body {
+      font-size: 14px;
+    }
+  }
 }
