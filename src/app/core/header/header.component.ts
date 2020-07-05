@@ -20,6 +20,11 @@ export class HeaderComponent implements OnInit {
     this.isActive = !this.isActive;
   }
 
+  // Force close the menu
+  closeMenu(): void {
+    this.isActive = false;
+  }
+
   // On user clicks on login / signup
   openLoginDialog(): void {
     const dialogRef = this.matDialog.open(LoginDialogComponent, {

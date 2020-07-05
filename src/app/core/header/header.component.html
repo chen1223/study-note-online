@@ -2,6 +2,7 @@
         [ngClass]="{
           'opened': isActive
         }">
+  <div class="menu-backdrop" (click)="closeMenu()"></div>
   <div class="page-inner-wrapper">
     <div class="brand-wrapper">
       <fa-icon class="brand __icon" [icon]="['fa', 'graduation-cap']" aria-label="graduation cap"></fa-icon>

@@ -55,6 +55,22 @@ describe('HeaderComponent', () => {
     expect(component.isActive).toBeFalsy();
   });
 
+  it('should close sidenav on closeMenu called', () => {
+    component.isActive = true;
+    fixture.detectChanges();
+    component.closeMenu();
+    fixture.detectChanges();
+    expect(component.isActive).toBeFalsy();
+  });
+
+  it('should call closeMenu function on menu backdrop clicked', () => {
+    const el = fixture.debugElement.query(By.css('.menu-backdrop'));
+    const fnc = spyOn(component, 'closeMenu').and.callFake(() => {});
+    el.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalled();
+  });
+
   it('should define matDialog', () => {
     expect(component.matDialog).toBeTruthy();
     expect(component.matDialog).toBeInstanceOf(MatDialog);

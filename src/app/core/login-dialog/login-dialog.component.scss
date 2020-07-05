@@ -79,3 +79,71 @@ button.fbBtn {
     }
   }
 }
+@media (orientation: portrait) {
+  @media (min-width: 320px) and (max-width: 766px) {
+    .dialog-wrapper,
+    .author-wrapper {
+      width: 90%;
+    }
+    ::ng-deep {
+      .login-panel {
+        max-width: 90vw !important;
+      }
+    }
+  }
+}
+@media (orientation: landscape) {
+  @media (min-width: 767px) and (max-width: 988px) {
+    ::ng-deep {
+      .login-panel {
+        height: 90vh;
+        .mat-dialog-content {
+          overflow-y: hidden;
+        }
+      }
+    }
+    .brand-icon {
+      .__icon {
+        width: 4em;
+        max-width: 4em;
+      }
+    }
+  }
+  @media (min-width: 320px) and (max-width: 766px) {
+    ::ng-deep {
+      .login-panel {
+        height: 90vh;
+        .mat-dialog-content {
+          overflow-y: hidden;
+        }
+      }
+    }
+    .dialog-body {
+      padding: 1em 2em;
+    }
+    .brand-icon {
+      .__icon {
+        width: 4em;
+        max-width: 4em;
+      }
+    }
+    .quote-wrapper,
+    .author-wrapper {
+      width: 90%;
+    }
+    .quote-wrapper {
+      margin-top: 1em;
+    }
+    .author-wrapper {
+      margin-bottom: .5em;
+    }
+    button.fbBtn {
+      .fb__icon {
+        font-size: 1em;
+      }
+      span {
+        font-size: .95em;
+      }
+    }
+  }
+}

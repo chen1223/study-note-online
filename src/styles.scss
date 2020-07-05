@@ -10,10 +10,10 @@ html, body {
 body {
   margin: 0;
   position: relative;
+  background: $bgColor;
 }
 /** Page wrapper **/
 .page-wrapper {
-  background: $bgColor;
   min-height: calc(100% - #{$headerHeight});
 }
 .page-inner-wrapper {
@@ -57,6 +57,16 @@ button {
     padding: 0;
   }
 }
+@media (min-width: 767px) and (max-width: 980px) {
+  body {
+    font-size: 14px;
+  }
+}
+@media (min-width: 320px) and (max-width: 766px) {
+  body {
+    font-size: 14px;
+  }
+}
 @media (orientation: landscape) {
   @media (min-width: 960px) {
     body {
@@ -71,6 +81,3 @@ button {
     }
   }
 }
-
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
