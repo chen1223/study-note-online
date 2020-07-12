@@ -9,10 +9,13 @@
   display: flex;
   position: relative;
   background: transparent;
+  max-width: $maxPageWidth;
+  margin: auto;
 }
 .brand-wrapper {
   margin: auto 0;
   color: $white;
+  text-decoration: none;
 }
 .action-wrapper {
   margin: auto 0;
@@ -99,6 +102,9 @@
     font-size: 1.4em;
     color: $white;
     cursor: pointer;
+    &:last-child {
+      margin-right: 0;
+    }
   }
 }
 /** Action wrapper **/

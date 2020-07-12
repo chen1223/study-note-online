@@ -2,10 +2,14 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 
-const routes: Routes = [
+export const routes: Routes = [
   {
     path: '',
     loadChildren: () => import('./core/core.module').then(m => m.CoreModule)
+  },
+  {
+    path: 'vocab',
+    loadChildren: () => import('./vocab/vocab.module').then(m => m.VocabModule)
   }
 ];
 

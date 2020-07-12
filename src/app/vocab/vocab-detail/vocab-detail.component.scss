@@ -1,0 +1,18 @@
+
+.content {
+  margin: 2em 0;
+}
+.title-ctrl {
+  width: 30%;
+  max-width: 300px;
+}
+/** New button **/
+.new-btn {
+  position: absolute;
+  right: 2em;
+  bottom: 15%;
+  z-index: 500;
+  .__icon {
+    font-size: 1em;
+  }
+}

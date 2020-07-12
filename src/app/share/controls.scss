@@ -1,0 +1,22 @@
+@import './variable.scss';
+
+label {
+  margin-right: 1em;
+  color: $black;
+  font-size: 1.2em;
+  &:after {
+    content: ':';
+  }
+}
+
+input {
+  color: $black;
+  &.underline {
+    font-size: 1.2em;
+    border: none;
+    background: none;
+    border-bottom: 1px solid gray;
+    outline: none;
+    padding: 0 .5em;
+  }
+}

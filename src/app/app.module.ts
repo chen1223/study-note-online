@@ -7,7 +7,10 @@ import { AppComponent } from './app.component';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import { faGraduationCap,
          faSearch,
-         faPen } from '@fortawesome/free-solid-svg-icons';
+         faPen,
+         faAngleLeft,
+         faPlus,
+         faUndo } from '@fortawesome/free-solid-svg-icons';
 import { faFacebookSquare } from '@fortawesome/free-brands-svg-icons';
 import { ShareModule } from './share/share.module';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -34,7 +37,10 @@ export class AppModule {
     [faGraduationCap,
      faSearch,
      faPen,
-     faFacebookSquare].forEach(icon => {
+     faFacebookSquare,
+     faAngleLeft,
+     faPlus,
+     faUndo].forEach(icon => {
       library.add(icon);
     });
   }

@@ -1,0 +1,5 @@
+<ul class="breadcrumb-list">
+  <li class="breadcrumb" *ngFor="let item of breadcrumbList">
+    <a [routerLink]="item.link" class="link" [attr.aria-label]="item.text">{{ item.text }}</a>
+  </li>
+</ul>

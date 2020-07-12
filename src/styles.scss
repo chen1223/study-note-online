@@ -1,5 +1,6 @@
 @import 'https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700&display=swap';
 @import './app/share/variable.scss';
+@import './app/share/controls.scss';
 * {
   font-family: 'Montserrat', sans-serif;
   box-sizing: border-box;
@@ -15,11 +16,10 @@ body {
 /** Page wrapper **/
 .page-wrapper {
   min-height: calc(100% - #{$headerHeight});
-}
-.page-inner-wrapper {
-  padding: 1em 2em;
+  padding: 2em;
   max-width: 1400px;
   margin: auto;
+  position: relative;
 }
 .inner-wrapper {
   margin: auto;
@@ -37,6 +37,7 @@ button {
   border: none;
   background: linear-gradient(45deg, $red 20%, $orange 100%);
   cursor: pointer;
+  padding: .5em 1em;
 }
 .sub-btn {
   background: $red;
@@ -52,14 +53,59 @@ button {
   height: 40px;
   box-shadow: 2px 2px 6px rgba(0,0,0,0.18);
 }
+/* Back link */
+.back-link {
+  text-decoration: none;
+  cursor: pointer;
+  color: $black;
+  font-size: 1.2em;
+}
+/* Page title */
+.page-title {
+  color: $black;
+  font-size: 1.6em;
+  font-weight: 600;
+  margin: 1.5em 0;
+}
+/* Action row */
+.action-btns {
+  text-align: right;
+  button {
+    margin-left: 1em;
+    width: 6em;
+  }
+}
 @media (min-width: 1400px) {
   .page-inner-wrapper {
     padding: 0;
+  }
+  .action-row {
+    display: flex;
+    justify-content: space-between;
+    .action-btns {
+      margin: auto 0;
+    }
+  }
+}
+@media (min-width: 981px) and (max-width: 1400px) {
+  .action-row {
+    display: flex;
+    justify-content: space-between;
+    .action-btns {
+      margin: auto 0;
+    }
   }
 }
 @media (min-width: 767px) and (max-width: 980px) {
   body {
     font-size: 14px;
+  }
+  .action-row {
+    display: flex;
+    justify-content: space-between;
+    .action-btns {
+      margin: auto 0;
+    }
   }
 }
 @media (min-width: 320px) and (max-width: 766px) {

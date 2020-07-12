@@ -1,5 +1,5 @@
 <!-- Action box -->
-<div class="action-box">
+<div class="action-box" *ngIf="canShow()">
   <ul class="action-list"
       [ngClass]="{
         'shown': isOpen
