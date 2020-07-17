@@ -1,14 +1,58 @@
 @import '../../../share/variable.scss';
 
+/* Index card ratio */
+$cardRatio: calc(795 / 466);
+
+/* Make index card's height portpotional to its width */
+@mixin card-width-height($currentWidth) {
+  width: $currentWidth;
+  padding-bottom: calc(#{$currentWidth} / #{$cardRatio});
+}
+/* Get flip button position based on card width */
+@mixin flip-btn-position($currentWidth) {
+  margin-top: calc(#{$currentWidth} / #{$cardRatio} - 3em);
+}
+
+
+$width: 100%;
+.card__wrapper--front,
+.card__wrapper--back {
+  @include card-width-height($width);
+  height: 0;
+  position: relative;
+}
+.card--front,
+.card--back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+.card__body {
+  height: 100%;
+}
+
 .card-wrapper {
   margin-top: 2em;
   position: relative;
 }
 .flip-btn {
   position: absolute;
-  bottom: -1em;
   right: 2%;
   z-index: 10;
+  @include flip-btn-position($width);
+}
+.remove-btn {
+  position: absolute;
+  right: 2%;
+  z-index: 10;
+  top: 4em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: $white;
+  .__icon {
+    font-size: 1.25em;
+  }
 }
 .card {
   transform-style: preserve-3d;
@@ -22,15 +66,15 @@
     transform: rotateY(180deg);
   }
 }
-.card--front,
-.card--back {
+.card__wrapper--front,
+.card__wrapper--back {
   position: absolute;
   width: 100%;
   .card__title {
     display: none;
   }
 }
-.card--back {
+.card__wrapper--back {
   transform: rotateY(180deg);
 }
 .card__title {
@@ -56,9 +100,9 @@
   }
 }
 .desc {
-  background: linear-gradient(to bottom, transparent, transparent calc(#{$lineHeight} - 1px), $lineColor 0px);
+  background: linear-gradient(to bottom, transparent, transparent calc(#{$lineHeight} - 2px), $lineColor 0px);
   background-size: 100% $lineHeight;
-  background-position-y: calc(#{$lineHeight} - 1px);
+  background-position-y: calc(#{$lineHeight} - 2px);
   padding: 0 1em;
   margin: auto;
   display: block;
@@ -67,4 +111,36 @@
   outline: none;
   resize: none;
   height: 100%;
+  width: 80%;
+}
+@media (orientation: portrait) {
+  @media (min-width: 767px) {
+    /* Display two cards side by side */
+    $width: calc(50% - 10px);
+    .card {
+      display: flex;
+      justify-content: space-between;
+      &.back {
+        transform: none;
+      }
+    }
+    .card__wrapper--front,
+    .card__wrapper--back {
+      @include card-width-height($width);
+      position: relative;
+    }
+    .card__wrapper--front {
+      order: 1;
+    }
+    .card__wrapper--back {
+      transform: none;
+      order: 2;
+    }
+    .flip-btn {
+      display: none;
+    }
+  }
+}
+@media (orientation: landscape) {
+
 }

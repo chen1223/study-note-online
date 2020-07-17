@@ -9,6 +9,10 @@
     <!-- Flip button -->
     <button class="flip-btn round-btn main-btn" type="button" aria-label="flip card" (click)="flipCard(i)">
       <fa-icon class="__icon" [icon]="['fa', 'undo']" aria-label="flip card"></fa-icon>
+    </button><!-- End of Flip button -->
+    <!-- Remove button -->
+    <button class="remove-btn round-btn sub-btn" type="button" aria-label="remove card">
+      <fa-icon class="__icon" [icon]="['fa', 'times']" aria-label="remove card"></fa-icon>
     </button>
     <div class="card"
         [formGroup]="item"
@@ -17,30 +21,34 @@
           'back': !item.get('frontOnTop').value
         }">
       <!-- Front -->
-      <div class="card--front">
-        <span class="card__title">Front</span>
-        <!-- Card body -->
-        <div class="card__body">
-          <ng-container *ngIf="mode !== 'view';else viewFront">
-            <input type="text" class="ctrl vocab" formControlName="vocab">
-          </ng-container>
-          <ng-template #viewFront>
-            <span class="vocab">{{ item.get('vocab').value }}</span>
-          </ng-template>
-        </div><!-- End of card body -->
+      <div class="card__wrapper--front">
+        <div class="card--front">
+          <span class="card__title">Front</span>
+          <!-- Card body -->
+          <div class="card__body">
+            <ng-container *ngIf="mode !== 'view';else viewFront">
+              <input type="text" class="ctrl vocab" formControlName="vocab">
+            </ng-container>
+            <ng-template #viewFront>
+              <span class="vocab">{{ item.get('vocab').value }}</span>
+            </ng-template>
+          </div><!-- End of card body -->
+        </div>
       </div><!-- End of Front -->
       <!-- Back -->
-      <div class="card--back">
-        <span class="card__title">Back</span>
-        <!-- Card body -->
-        <div class="card__body">
-          <ng-container *ngIf="mode !== 'view';else viewBack">
-            <textarea cols="30" rows="10" class="desc" formControlName="desc"></textarea>
-          </ng-container>
-          <ng-template #viewBack>
-            <p class="desc">{{ item.get('desc').value }}</p>
-          </ng-template>
-        </div><!-- End of card body -->
+      <div class="card__wrapper--back">
+        <div class="card--back">
+          <span class="card__title">Back</span>
+          <!-- Card body -->
+          <div class="card__body">
+            <ng-container *ngIf="mode !== 'view';else viewBack">
+              <textarea cols="30" rows="10" class="desc" formControlName="desc"></textarea>
+            </ng-container>
+            <ng-template #viewBack>
+              <p class="desc">{{ item.get('desc').value }}</p>
+            </ng-template>
+          </div><!-- End of card body -->
+        </div>
       </div><!-- End of Back -->
     </div><!-- End of card -->
   </div><!-- End of card wrapper -->

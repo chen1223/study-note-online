@@ -47,10 +47,14 @@ describe('IndexCardComponent', () => {
       frontOnTop: new FormControl(true)
     })]);
     fixture.detectChanges();
-    const front = fixture.debugElement.query(By.css('.card--front'));
-    const back = fixture.debugElement.query(By.css('.card--back'));
-    expect(front).toBeTruthy();
-    expect(back).toBeTruthy();
+    const frontWrapper = fixture.debugElement.query(By.css('.card__wrapper--front'));
+    const backWrapper = fixture.debugElement.query(By.css('.card__wrapper--back'));
+    expect(frontWrapper).toBeTruthy();
+    expect(backWrapper).toBeTruthy();
+    const frontCard = frontWrapper.nativeElement.querySelector('.card--front');
+    const backCard = backWrapper.nativeElement.querySelector('.card--back');
+    expect(frontCard).toBeTruthy();
+    expect(backCard).toBeTruthy();
   });
   it('shoud render data on the HTML', () => {
     component.vocabs = new FormArray([
@@ -80,16 +84,6 @@ describe('IndexCardComponent', () => {
   /**
    * Index card rendering test
    */
-  it('should render index card to correct ratio', () => {
-    expect(component.renderCard).toBeDefined();
-    const fnc = spyOn(component, 'renderCard');
-    component.vocabs = new FormArray([new FormGroup({
-      vocab: new FormControl('test'),
-      desc: new FormControl('123')
-    })]);
-    component.ngAfterViewInit();
-    expect(fnc).toHaveBeenCalled();
-  });
   it('should bind flip class to the frontOnTop property', () => {
     expect(component.prepareData).toBeDefined();
     const fnc = spyOn(component, 'prepareData');
@@ -111,6 +105,8 @@ describe('IndexCardComponent', () => {
     expect(el).toBeTruthy();
     expect(el.nativeElement).toHaveClass('round-btn');
     expect(el.nativeElement.getAttribute('aria-label')).toBe('flip card');
+    const faIcon = el.nativeElement.querySelector('fa-icon');
+    expect(faIcon).toBeTruthy();
   });
   it('should bind flipCard function to the flip button', () => {
     expect(component.flipCard).toBeDefined();
@@ -136,5 +132,38 @@ describe('IndexCardComponent', () => {
     fixture.detectChanges();
     const card = fixture.debugElement.query(By.css('.card'));
     expect(card.nativeElement).not.toHaveClass('front');
+  });
+
+  /**
+   * Remove button related tests
+   */
+  it('should have remove button on each card', () => {
+    component.vocabs = new FormArray([
+      new FormGroup({
+        vocab: new FormControl('test'),
+        desc: new FormControl('123'),
+        frontOnTop: new FormControl(true)
+      }),
+      new FormGroup({
+        vocab: new FormControl('book'),
+        desc: new FormControl('book 123'),
+        frontOnTop: new FormControl(true)
+      })
+    ]);
+    fixture.detectChanges();
+    // Verify remove buttons renders correct number
+    const cardEls = fixture.debugElement.queryAll(By.css('.card'));
+    expect(cardEls.length).toEqual(component.vocabs.length);
+    const removeBtns = fixture.debugElement.queryAll(By.css('.remove-btn'));
+    expect(removeBtns.length).toEqual(component.vocabs.length);
+    // Verify each remove button have the 'round-btn' class
+    removeBtns.forEach(btn => {
+      expect(btn.nativeElement.classList).toContain('round-btn');
+      expect(btn.nativeElement.classList).toContain('sub-btn');
+      expect(btn.nativeElement.getAttribute('aria-label')).toEqual('remove card');
+      // Each remove button should have fontawesome icon
+      const icon = btn.nativeElement.querySelector('fa-icon');
+      expect(icon).toBeTruthy();
+    });
   });
 });
