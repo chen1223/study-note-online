@@ -8,6 +8,9 @@ $cardRatio: calc(795 / 466);
   width: $currentWidth;
   padding-bottom: calc(#{$currentWidth} / #{$cardRatio});
 }
+@mixin card-height($currentWidth) {
+  padding-bottom: calc(#{$currentWidth} / #{$cardRatio});
+}
 /* Get flip button position based on card width */
 @mixin flip-btn-position($currentWidth) {
   margin-top: calc(#{$currentWidth} / #{$cardRatio} - 3em);
@@ -32,7 +35,6 @@ $width: 100%;
 }
 
 .card-wrapper {
-  margin-top: 2em;
   position: relative;
 }
 .flip-btn {
@@ -59,6 +61,7 @@ $width: 100%;
   transform: rotateY(0deg);
   position: relative;
   transition: transform .45s;
+  margin-bottom: 4em;
   &.front {
     transform: rotateY(0deg);
   }
@@ -96,6 +99,7 @@ $width: 100%;
       border-bottom: 1px solid $lineColor;
       outline: none;
       padding: 0 1em;
+      width: 50%;
     }
   }
 }
@@ -113,33 +117,39 @@ $width: 100%;
   height: 100%;
   width: 80%;
 }
-@media (orientation: portrait) {
-  @media (min-width: 767px) {
-    /* Display two cards side by side */
-    $width: calc(50% - 10px);
-    .card {
-      display: flex;
-      justify-content: space-between;
-      &.back {
-        transform: none;
-      }
-    }
-    .card__wrapper--front,
-    .card__wrapper--back {
-      @include card-width-height($width);
-      position: relative;
-    }
-    .card__wrapper--front {
-      order: 1;
-    }
-    .card__wrapper--back {
+@media (min-width: 767px) {
+  /* Display two cards side by side */
+  $width: calc(50% - 1em);
+  .card {
+    display: flex;
+    justify-content: space-between;
+    &.back {
       transform: none;
-      order: 2;
-    }
-    .flip-btn {
-      display: none;
     }
   }
+  .card__wrapper--front,
+  .card__wrapper--back {
+    @include card-width-height($width);
+    position: relative;
+  }
+  .card__wrapper--front {
+    order: 1;
+  }
+  .card__wrapper--back {
+    transform: none;
+    order: 2;
+  }
+  .flip-btn {
+    display: none;
+  }
+}
+@media (max-width: 766px) {
+  .card {
+    @include card-height($width);
+  }
+}
+@media (orientation: portrait) {
+
 }
 @media (orientation: landscape) {
 

@@ -17,7 +17,7 @@ body {
 .page-wrapper {
   min-height: calc(100% - #{$headerHeight});
   padding: 2em;
-  max-width: 1400px;
+  max-width: 1600px;
   margin: auto;
   position: relative;
 }
@@ -52,6 +52,9 @@ button {
   width: 40px;
   height: 40px;
   box-shadow: 2px 2px 6px rgba(0,0,0,0.18);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 /* Back link */
 .back-link {
@@ -73,9 +76,16 @@ button {
   button {
     margin-left: 1em;
     width: 6em;
+    font-size: 1em;
   }
 }
 @media (min-width: 1400px) {
+  body {
+    font-size: 16px;
+  }
+  .page-wrapper {
+    padding: 4em 6em;
+  }
   .page-inner-wrapper {
     padding: 0;
   }
@@ -114,11 +124,7 @@ button {
   }
 }
 @media (orientation: landscape) {
-  @media (min-width: 960px) {
-    body {
-      font-size: 14px;
-    }
-  }
+
 }
 @media (orientation: portrait) {
   @media (min-width: 960px) {

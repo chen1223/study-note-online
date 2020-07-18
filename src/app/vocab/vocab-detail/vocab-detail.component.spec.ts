@@ -5,7 +5,7 @@ import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core
 import { VocabDetailComponent } from './vocab-detail.component';
 import { By } from '@angular/platform-browser';
 import { Component, Input } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, FormControl, FormArray, FormGroup } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, FormControl, FormArray, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { of } from 'rxjs';
 import { IndexCardComponent } from './index-card/index-card.component';
@@ -23,7 +23,14 @@ class MockActivatedRoute {
 }
 
 @Component({
-  selector: 'app-index-card'
+  selector: 'app-index-card',
+  template: `
+    <div class="card-wrapper">
+      <div class="card--front">
+        <input class="ctrl">
+      </div>
+    </div>
+  `
 })
 export class MockIndexCardComponent {
   @Input() mode = '';
@@ -85,8 +92,10 @@ describe('VocabDetailComponent', () => {
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
     mockActivatedRoute = TestBed.inject(ActivatedRoute);
+    (component.form.get('vocabs') as FormArray).clear();
     fixture.detectChanges();
   });
+
   /**
    * Mode related tests
    */
@@ -98,7 +107,11 @@ describe('VocabDetailComponent', () => {
     fixture.detectChanges();
     expect(fnc).toHaveBeenCalled();
   });
-  it('should set create mode correctly', fakeAsync(() => {
+
+  /**
+   * Create mode related tests
+   */
+  it('should set mode to create mode when the url has the new keyword', fakeAsync(() => {
     mockActivatedRoute.data = of({ mode: 'create' });
     component.ngOnInit();
     fixture.detectChanges();
@@ -108,7 +121,67 @@ describe('VocabDetailComponent', () => {
     fixture.detectChanges();
     expect(component.mode).toEqual('create');
   }));
-  it('should set view mode correctly', fakeAsync(() => {
+  it('should clear form on resetForm called', () => {
+    // Test if resetForm is defined
+    expect(component.resetForm).toBeTruthy();
+    const form = component.form as FormGroup;
+    form.get('title').setValue('dummy title');
+    const vocabArray = form.get('vocabs') as FormArray;
+    vocabArray.push(new FormGroup({
+      vocab: new FormControl('', Validators.required),
+      desc: new FormControl('', Validators.required)
+    }));
+    fixture.detectChanges();
+    component.resetForm();
+    fixture.detectChanges();
+    expect(form.get('title').value).toBeNull();
+    expect(vocabArray.length).toEqual(0);
+  });
+  it('should reset form in create mode', fakeAsync(() => {
+    const fnc = spyOn(component, 'resetForm');
+    mockActivatedRoute.data = of({ mode: 'create' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    // Create mode test
+    router.navigateByUrl('vocab/new');
+    tick();
+    fixture.detectChanges();
+    expect(component.mode).toEqual('create');
+    expect(fnc).toHaveBeenCalled();
+  }));
+  it('should enable form in create mode', fakeAsync(() => {
+    const form = component.form as FormGroup;
+    form.disable();
+    mockActivatedRoute.data = of({ mode: 'create' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    // Create mode test
+    router.navigateByUrl('vocab/new');
+    tick();
+    fixture.detectChanges();
+    expect(component.mode).toEqual('create');
+    expect(form.enabled).toBeTruthy();
+  }));
+  it('should call the addVoab function in create mode', () => {
+    mockActivatedRoute.data = of({ mode: 'create' });
+    const fnc = spyOn(component, 'addVocab').and.callThrough();
+    component.ngOnInit();
+    expect(fnc).toHaveBeenCalledWith(false);
+  });
+  it('should set focus on the title input in create mode', fakeAsync(() => {
+    mockActivatedRoute.data = of({ mode: 'create' });
+    component.setMode();
+    fixture.detectChanges();
+    tick();
+    const titleEl = fixture.debugElement.query(By.css('.ctrl-wrapper.--title .ctrl'));
+    const focusedEl = fixture.debugElement.query(By.css(':focus'));
+    expect(focusedEl.nativeElement).toBe(titleEl.nativeElement);
+  }));
+
+  /**
+   * View mode related tests
+   */
+  it('should set mode to view mode when the url has the view keyword', fakeAsync(() => {
     mockActivatedRoute.data = of({ mode: 'view' });
     component.ngOnInit();
     fixture.detectChanges();
@@ -118,7 +191,11 @@ describe('VocabDetailComponent', () => {
     fixture.detectChanges();
     expect(component.mode).toEqual('view');
   }));
-  it('should set update mode correctly', fakeAsync(() => {
+
+  /**
+   * Update mode related test
+   */
+  it('should mode to update mode when the url has the update mode keyword', fakeAsync(() => {
     mockActivatedRoute.data = of({ mode: 'update' });
     component.ngOnInit();
     fixture.detectChanges();
@@ -221,12 +298,6 @@ describe('VocabDetailComponent', () => {
     const formArray = component.form.get('vocabs');
     expect(formArray).toBeTruthy();
   });
-  it('should call the addVoab function in create mode', () => {
-    mockActivatedRoute.data = of({ mode: 'create' });
-    const fnc = spyOn(component, 'addVocab').and.callFake(() => {});
-    component.ngOnInit();
-    expect(fnc).toHaveBeenCalled();
-  });
   it('should initialize 1 item in vocabs formarray in create mode', () => {
     mockActivatedRoute.data = of({ mode: 'create' });
     const vocabArray = component.form.get('vocabs') as FormArray;
@@ -248,6 +319,21 @@ describe('VocabDetailComponent', () => {
     fixture.detectChanges();
     expect(vocabArray.length).toBe(1);
   });
+  it('should set focus to the new index card on addVocab called', fakeAsync(() => {
+    component.addVocab();
+    fixture.detectChanges();
+    tick();
+    const lastCardCtrl = fixture.debugElement.query(By.css('.card-wrapper:last-child .card--front .ctrl'));
+    const focusedEl = fixture.debugElement.query(By.css(':focus'));
+    expect(focusedEl.nativeElement).toBe(lastCardCtrl.nativeElement);
+  }));
+  it('should not set focus to the new index card addVocab is called and false is passed', fakeAsync(() => {
+    component.addVocab(false);
+    fixture.detectChanges();
+    tick();
+    const focusedEl = fixture.debugElement.query(By.css(':focus'));
+    expect(focusedEl).toBeNull();
+  }));
 
   /**
    * New button related tests
@@ -258,6 +344,18 @@ describe('VocabDetailComponent', () => {
     expect(el.nativeElement).toHaveClass('round-btn');
     expect(el.nativeElement).toHaveClass('main-btn');
     expect(el.nativeElement.getAttribute('aria-label')).toContain('new vocab');
+  });
+  it('should call the addVocab function on new vocab button click', () => {
+    const fnc = spyOn(component, 'addVocab').and.callThrough();
+    const vocabArray = component.form.get('vocabs') as FormArray;
+    vocabArray.clear();
+    fixture.detectChanges();
+    expect(vocabArray.length).toBe(0);
+    const newBtnEl = fixture.debugElement.query(By.css('.new-btn'));
+    newBtnEl.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalled();
+    expect(vocabArray.length).toBe(1);
   });
 
   /**

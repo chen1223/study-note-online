@@ -1,6 +1,6 @@
 @import '../../share/variable.scss';
 .action-box {
-  position: absolute;
+  position: fixed;
   right: 2em;
   bottom: 30%;
   z-index: 500;
@@ -79,5 +79,10 @@
   }
   100% {
     overflow: visible;
+  }
+}
+@media (min-width: 1400px) {
+  .action-box {
+    right: 6em;
   }
 }

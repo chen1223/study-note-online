@@ -82,16 +82,6 @@ describe('IndexCardComponent', () => {
   });
 
   /**
-   * Index card rendering test
-   */
-  it('should bind flip class to the frontOnTop property', () => {
-    expect(component.prepareData).toBeDefined();
-    const fnc = spyOn(component, 'prepareData');
-    component.ngOnInit();
-    expect(fnc).toHaveBeenCalled();
-  });
-
-  /**
    * Flip button related tests
    */
   it('should render flip button on the HTML', () => {
@@ -165,5 +155,52 @@ describe('IndexCardComponent', () => {
       const icon = btn.nativeElement.querySelector('fa-icon');
       expect(icon).toBeTruthy();
     });
+  });
+  it('should define onRemoveClick function', () => {
+    expect(component.onRemoveClick).toBeTruthy();
+    const fnc = spyOn(component, 'onRemoveClick').and.callThrough();
+    const index = 0;
+    component.onRemoveClick(index);
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalledWith(index);
+    // Test missing input
+    component.onRemoveClick(null);
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalledWith(null);
+  });
+  it('should remove item from the vocabs array when onRemoveClick is called', () => {
+    const vocab1Title = 'vocab1';
+    const vocab2Title = 'vocab2';
+    component.vocabs = new FormArray([
+      new FormGroup({
+        vocab: new FormControl(vocab1Title),
+        desc: new FormControl('123'),
+        frontOnTop: new FormControl(true)
+      }),
+      new FormGroup({
+        vocab: new FormControl(vocab2Title),
+        desc: new FormControl('book 123'),
+        frontOnTop: new FormControl(true)
+      })
+    ]);
+    fixture.detectChanges();
+    component.onRemoveClick(0);
+    fixture.detectChanges();
+    const vocabArray = component.vocabs as FormArray;
+    expect(vocabArray.length).toBe(1);
+    const remainingVocabTitle = vocabArray.at(0).get('vocab').value;
+    expect(remainingVocabTitle).toBe(vocab2Title);
+  });
+  it('should not show remove button when there is only 1 card left', () => {
+    component.vocabs = new FormArray([
+      new FormGroup({
+        vocab: new FormControl('vocab1'),
+        desc: new FormControl('123'),
+        frontOnTop: new FormControl(true)
+      })
+    ]);
+    fixture.detectChanges();
+    const removeBtns = fixture.debugElement.queryAll(By.css('.remove-btn'));
+    expect(removeBtns.length).toEqual(0);
   });
 });

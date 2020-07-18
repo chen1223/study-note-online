@@ -3,13 +3,13 @@
 .header {
   background: $gradientBg;
 }
-.page-inner-wrapper {
+.page-wrapper {
   height: $headerHeight;
-  padding: 1em 2em;
+  padding-top: 1em;
+  padding-bottom: 1em;
   display: flex;
   position: relative;
   background: transparent;
-  max-width: $maxPageWidth;
   margin: auto;
 }
 .brand-wrapper {

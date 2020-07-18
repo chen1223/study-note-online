@@ -11,7 +11,7 @@ import { ActivatedRoute } from '@angular/router';
 })
 export class VocabDetailComponent implements OnInit {
   form = this.fb.group({
-    title: ['', [Validators.required]],
+    title: [null, [Validators.required]],
     vocabs: this.fb.array([])
   });
 
@@ -35,7 +35,14 @@ export class VocabDetailComponent implements OnInit {
       switch (this.mode) {
         case 'create':
           this.title = 'New Vocabulary Pack';
-          this.addVocab();
+          this.resetForm();
+          this.form.enable();
+          this.addVocab(false);
+          // Set focus to the title input
+          setTimeout(() => {
+            const titleEl = document.querySelector('.--title .ctrl') as HTMLInputElement;
+            titleEl.focus();
+          }, 0);
           break;
         case 'view':
           this.title = 'View Vocabulary Pack';
@@ -48,13 +55,31 @@ export class VocabDetailComponent implements OnInit {
   }
 
   /**
+   * Reset the form
+   */
+  resetForm(): void {
+    this.form.reset();
+    (this.form.get('vocabs') as FormArray).clear();
+  }
+
+  /**
    * Add one vocab item to the FormArray
    */
-  addVocab(): void {
+  addVocab(focus = true): void {
     (this.form.get('vocabs') as FormArray).push(this.fb.group({
       vocab: ['', [Validators.required]],
-      desc: ['', [Validators.required]]
+      desc: ['', [Validators.required]],
+      frontOnTop: [true]
     }));
+    if (focus) {
+      setTimeout(() => {
+        // Set focus on the the card we just added
+        const newCardCtrl = document.querySelector('.card-wrapper:last-child .card--front .ctrl') as HTMLInputElement;
+        if (newCardCtrl) {
+          newCardCtrl.focus();
+        }
+      }, 0);
+    }
   }
 
   back(): void {

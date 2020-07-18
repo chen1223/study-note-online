@@ -6,13 +6,21 @@
   width: 30%;
   max-width: 300px;
 }
+.ctrl-wrapper {
+  margin-bottom: 2em;
+}
 /** New button **/
 .new-btn {
-  position: absolute;
+  position: fixed;
   right: 2em;
   bottom: 15%;
   z-index: 500;
   .__icon {
     font-size: 1em;
+  }
+}
+@media (min-width: 1400px) {
+  .new-btn {
+    right: 6em;
   }
 }

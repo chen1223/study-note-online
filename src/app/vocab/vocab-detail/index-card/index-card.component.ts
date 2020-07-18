@@ -1,5 +1,5 @@
 import { FormBuilder, FormGroup, FormControl } from '@angular/forms';
-import { Component, OnInit, Input } from '@angular/core';
+import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-index-card',
@@ -13,16 +13,7 @@ export class IndexCardComponent implements OnInit {
   constructor(private fb: FormBuilder) { }
 
   ngOnInit(): void {
-    this.prepareData();
-  }
 
-  /**
-   * Add frontOnTop property to each card
-   */
-  prepareData(): void {
-    this.vocabs.controls.forEach(vocab => {
-      (vocab as FormGroup).addControl('frontOnTop', new FormControl(true));
-    });
   }
 
   /**
@@ -31,5 +22,12 @@ export class IndexCardComponent implements OnInit {
   flipCard(index): void {
     const frontOnTopCtrl = this.vocabs.at(index).get('frontOnTop');
     frontOnTopCtrl.setValue(!frontOnTopCtrl.value);
+  }
+
+  /**
+   * On remove button click
+   */
+  onRemoveClick(index): void {
+    this.vocabs.removeAt(index);
   }
 }

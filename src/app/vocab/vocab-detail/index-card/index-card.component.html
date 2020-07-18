@@ -11,7 +11,11 @@
       <fa-icon class="__icon" [icon]="['fa', 'undo']" aria-label="flip card"></fa-icon>
     </button><!-- End of Flip button -->
     <!-- Remove button -->
-    <button class="remove-btn round-btn sub-btn" type="button" aria-label="remove card">
+    <button *ngIf="vocabs.controls.length > 1"
+            class="remove-btn round-btn sub-btn"
+            type="button"
+            aria-label="remove card"
+            (click)="onRemoveClick(i)">
       <fa-icon class="__icon" [icon]="['fa', 'times']" aria-label="remove card"></fa-icon>
     </button>
     <div class="card"
