@@ -97,7 +97,19 @@ button {
     }
   }
 }
-@media (min-width: 981px) and (max-width: 1400px) {
+@media (min-width: 1200px) and (max-width: 1399px) {
+  .action-row {
+    display: flex;
+    justify-content: space-between;
+    .action-btns {
+      margin: auto 0;
+    }
+  }
+  .page-wrapper {
+    padding: 3em 4em;
+  }
+}
+@media (min-width: 981px) and (max-width: 1199px) {
   .action-row {
     display: flex;
     justify-content: space-between;

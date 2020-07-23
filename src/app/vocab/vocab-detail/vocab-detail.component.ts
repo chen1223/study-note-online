@@ -3,6 +3,8 @@ import { Breadcrumb } from './../../share/breadcrumb/breadcrumb.component';
 import { Component, OnInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { VocabService } from './../vocab.service';
 
 @Component({
   selector: 'app-vocab-detail',
@@ -20,6 +22,7 @@ export class VocabDetailComponent implements OnInit {
 
   constructor(public readonly location: Location,
               public readonly fb: FormBuilder,
+              public vocabService: VocabService,
               public readonly activatedRoute: ActivatedRoute) { }
 
   ngOnInit(): void {
@@ -84,5 +87,69 @@ export class VocabDetailComponent implements OnInit {
 
   back(): void {
     this.location.back();
+  }
+
+  /**
+   * On cancel click
+   */
+  onCancel(): void {
+
+  }
+
+  /**
+   * Validate form
+   *   1. Title cannot be empty
+   *   2. Must have at least one index card in the form array
+   */
+  isFormValid(): boolean {
+    // Mark form as touched
+    this.form.markAllAsTouched();
+    // Title verification
+    const titleCtrl = this.form.get('title');
+    let titleValid = false;
+    if (!titleCtrl.value) {
+      const titleCtrl = document.querySelector('input.title-ctrl') as HTMLInputElement;
+      titleCtrl.focus();
+      return titleValid;
+    }
+    titleValid = true;
+    // Vocab verification
+    let atLeastOneValid = false;
+    const vocabArrays = this.form.get('vocabs') as FormArray;
+    if (vocabArrays.length === 0) {
+      return atLeastOneValid;
+    }
+    for (let i = 0; i < vocabArrays.length; i++) {
+      const vocabGroup = vocabArrays.at(i);
+      const vocab = vocabGroup.get('vocab');
+      const desc = vocabGroup.get('desc');
+      if (vocab.valid && desc.valid) {
+        atLeastOneValid = true;
+        break;
+      } else if (vocab.invalid) {
+        const vocabCtrl = document.querySelectorAll('input.vocab')[i] as HTMLInputElement;
+        vocabCtrl.focus();
+      } else if (desc.invalid) {
+        const descCtrl = document.querySelectorAll('textarea.desc')[i] as HTMLTextAreaElement;
+        descCtrl.focus();
+      }
+    }
+    return titleValid && atLeastOneValid && this.form.valid;
+  }
+
+  /**
+   * On form submit
+   */
+  onSubmit(): void {
+    const valid = this.isFormValid();
+    if (!valid) {
+      return;
+    }
+    const body = this.form.getRawValue();
+    const apiCall = this.mode === 'create' ? this.vocabService.postVocab(body) : this.vocabService.patchVocab(body);
+    apiCall.subscribe(
+      res => {},
+      err => {}
+    );
   }
 }

@@ -32,6 +32,7 @@ $width: 100%;
 }
 .card__body {
   height: 100%;
+  box-shadow: 2px 3px 6px rgba(0, 0, 0, 0.16);
 }
 
 .card-wrapper {
@@ -96,10 +97,13 @@ $width: 100%;
     .vocab {
       border: none;
       background: none;
-      border-bottom: 1px solid $lineColor;
+      border-bottom: 2px solid $lineColor;
       outline: none;
       padding: 0 1em;
       width: 50%;
+    }
+    .vocab.ng-invalid.ng-touched {
+      border-color: $red;
     }
   }
 }
@@ -116,10 +120,14 @@ $width: 100%;
   resize: none;
   height: 100%;
   width: 80%;
+  &.ng-invalid.ng-touched {
+    background: linear-gradient(to bottom, transparent, transparent calc(#{$lineHeight} - 2px), $red 0px);
+    background-size: 100% $lineHeight;
+    background-position-y: calc(#{$lineHeight} - 2px);
+  }
 }
-@media (min-width: 767px) {
-  /* Display two cards side by side */
-  $width: calc(50% - 1em);
+/* Display two cards side by side*/
+@mixin two-layout($width) {
   .card {
     display: flex;
     justify-content: space-between;
@@ -127,10 +135,18 @@ $width: 100%;
       transform: none;
     }
   }
+  .card-wrapper {
+    .card__title {
+      display: none;
+    }
+  }
   .card__wrapper--front,
   .card__wrapper--back {
     @include card-width-height($width);
     position: relative;
+    .card__title {
+      display: block;
+    }
   }
   .card__wrapper--front {
     order: 1;
@@ -142,6 +158,17 @@ $width: 100%;
   .flip-btn {
     display: none;
   }
+}
+@media (min-width: 980px) {
+  $width: calc(50% - 2em);
+  @include two-layout($width);
+  .card {
+    margin-bottom: 6em;
+  }
+}
+@media (min-width: 767px) and (max-width: 979px) {
+  $width: calc(50% - 1em);
+  @include two-layout($width);
 }
 @media (max-width: 766px) {
   .card {

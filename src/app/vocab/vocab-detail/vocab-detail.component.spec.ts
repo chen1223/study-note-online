@@ -1,14 +1,18 @@
 import { RouterTestingModule } from '@angular/router/testing';
 import { MaterialModule } from './../../share/material.module';
-import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed, fakeAsync, tick, flush } from '@angular/core/testing';
+import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import { VocabDetailComponent } from './vocab-detail.component';
 import { By } from '@angular/platform-browser';
 import { Component, Input } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, FormControl, FormArray, FormGroup, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { of } from 'rxjs';
+import { of, Observable } from 'rxjs';
 import { IndexCardComponent } from './index-card/index-card.component';
+import { VocabService } from './../vocab.service';
+import { HttpClientModule } from '@angular/common/http';
+
 
 @Component({
   selector: 'app-breadcrumb',
@@ -22,12 +26,24 @@ class MockActivatedRoute {
   });
 }
 
+class MockVocabService {
+  postVocab(body): Observable<object> {
+    return of({});
+  }
+  patchVocab(body): Observable<object> {
+    return of({});
+  }
+}
+
 @Component({
   selector: 'app-index-card',
   template: `
     <div class="card-wrapper">
       <div class="card--front">
-        <input class="ctrl">
+        <input class="ctrl vocab">
+      </div>
+      <div class="card--back">
+        <textarea class="desc"></textarea>
       </div>
     </div>
   `
@@ -42,6 +58,8 @@ describe('VocabDetailComponent', () => {
   let fixture: ComponentFixture<VocabDetailComponent>;
   let router: Router;
   let mockActivatedRoute;
+  let mockHttp: HttpTestingController;
+  let mockVocabService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -53,6 +71,8 @@ describe('VocabDetailComponent', () => {
       imports: [
         ReactiveFormsModule,
         MaterialModule,
+        HttpClientModule,
+        HttpClientTestingModule,
         RouterTestingModule.withRoutes([
           {
             path: 'vocab/new',
@@ -81,6 +101,10 @@ describe('VocabDetailComponent', () => {
         {
           provide: ActivatedRoute,
           useClass: MockActivatedRoute
+        },
+        {
+          provide: VocabService,
+          useClass: MockVocabService
         }
       ]
     })
@@ -92,6 +116,8 @@ describe('VocabDetailComponent', () => {
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
     mockActivatedRoute = TestBed.inject(ActivatedRoute);
+    mockVocabService = TestBed.inject(VocabService);
+    mockHttp = TestBed.inject(HttpTestingController);
     (component.form.get('vocabs') as FormArray).clear();
     fixture.detectChanges();
   });
@@ -170,12 +196,11 @@ describe('VocabDetailComponent', () => {
   });
   it('should set focus on the title input in create mode', fakeAsync(() => {
     mockActivatedRoute.data = of({ mode: 'create' });
-    component.setMode();
     fixture.detectChanges();
-    tick();
+    component.setMode();
+    flush();
     const titleEl = fixture.debugElement.query(By.css('.ctrl-wrapper.--title .ctrl'));
-    const focusedEl = fixture.debugElement.query(By.css(':focus'));
-    expect(focusedEl.nativeElement).toBe(titleEl.nativeElement);
+    expect(document.activeElement).toBe(titleEl.nativeElement);
   }));
 
   /**
@@ -237,6 +262,19 @@ describe('VocabDetailComponent', () => {
     const cancelBtn = fixture.debugElement.query(By.css('.cancel-btn'));
     expect(saveBtn).toBeTruthy();
     expect(cancelBtn).toBeTruthy();
+  });
+  it('should invoke the onSubmit function on save button click', () => {
+    const fnc = spyOn(component, 'onSubmit').and.callFake(() => {});
+    const btnEl = fixture.debugElement.query(By.css('.save-btn'));
+    btnEl.triggerEventHandler('click', null);
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should invoke the onCancel function on cancel button click', () => {
+    expect(component.onCancel).toBeDefined();
+    const fnc = spyOn(component, 'onCancel').and.callFake(() => {});
+    const btnEl = fixture.debugElement.query(By.css('.cancel-btn'));
+    btnEl.triggerEventHandler('click', null);
+    expect(fnc).toHaveBeenCalled();
   });
 
   /**
@@ -306,6 +344,14 @@ describe('VocabDetailComponent', () => {
     fixture.detectChanges();
     expect(vocabArray.length).toBe(1);
   });
+  it('should bind onSubmit function to form', () => {
+    // should define onSubmit
+    expect(component.onSubmit).toBeDefined();
+    const form = fixture.debugElement.query(By.css('form'));
+    const fnc = spyOn(component, 'onSubmit').and.callFake(() => {});
+    form.triggerEventHandler('submit', null);
+    expect(fnc).toHaveBeenCalled();
+  });
 
   /**
    * Add vocab function related tests
@@ -323,9 +369,8 @@ describe('VocabDetailComponent', () => {
     component.addVocab();
     fixture.detectChanges();
     tick();
-    const lastCardCtrl = fixture.debugElement.query(By.css('.card-wrapper:last-child .card--front .ctrl'));
-    const focusedEl = fixture.debugElement.query(By.css(':focus'));
-    expect(focusedEl.nativeElement).toBe(lastCardCtrl.nativeElement);
+    const lastCard = fixture.debugElement.query(By.css('.card-wrapper:last-child .card--front .ctrl'));
+    expect(document.activeElement).toBe(lastCard.nativeElement);
   }));
   it('should not set focus to the new index card addVocab is called and false is passed', fakeAsync(() => {
     component.addVocab(false);
@@ -359,7 +404,7 @@ describe('VocabDetailComponent', () => {
   });
 
   /**
-   * Index card related tests
+   * Index card integration related tests
    */
   it('should have index card on the HTML', () => {
     const indexCards = fixture.debugElement.query(By.css('app-index-card'));
@@ -376,4 +421,127 @@ describe('VocabDetailComponent', () => {
     expect(indexCardComponent.vocabs.length).toEqual(vocabArray.length);
     expect(indexCardComponent.mode).toEqual(component.mode);
   });
+
+  /**
+   * Validation tests
+   */
+  it('should validate form title', () => {
+    expect(component.isFormValid).toBeDefined();
+    const form = component.form;
+    const titleCtrl = form.get('title');
+    titleCtrl.setValue('');
+    fixture.detectChanges();
+    expect(component.isFormValid()).toBeFalsy();
+
+    const vocabsArray = component.form.get('vocabs') as FormArray;
+    vocabsArray.controls.forEach(item => {
+      item.get('vocab').setValue('123');
+      item.get('desc').setValue('123');
+    });
+    titleCtrl.setValue('123');
+    fixture.detectChanges();
+    expect(component.isFormValid()).toBeTruthy();
+  });
+  it('should validate empty vocabs formarray', () => {
+    const form = component.form;
+    const vocabsArray = form.get('vocabs') as FormArray;
+    vocabsArray.clear();
+    fixture.detectChanges();
+    expect(component.isFormValid()).toBeFalsy();
+  });
+  it('should validate at least one valid item in vocabs formarray', () => {
+    const vocabsArray = component.form.get('vocabs') as FormArray;
+    vocabsArray.push(new FormGroup({
+      vocab: new FormControl(''),
+      desc: new FormControl('')
+    }));
+    fixture.detectChanges();
+    expect(component.isFormValid()).toBeFalsy();
+
+    const titleCtrl = component.form.get('title');
+    titleCtrl.setValue('title');
+    vocabsArray.controls.forEach(item => {
+      item.get('vocab').setValue('123');
+      item.get('desc').setValue('123');
+    });
+    fixture.detectChanges();
+    expect(component.isFormValid()).toBeTruthy();
+  });
+  it('should mark form as touched when call isFormValid', () => {
+    const markAllAsTouched = spyOn(component.form, 'markAllAsTouched');
+    component.isFormValid();
+    expect(markAllAsTouched).toHaveBeenCalled();
+  });
+  it('should return false when there are invalid controls', () => {
+    const form = component.form;
+    form.get('title').setValue('123');
+    const vocabsArray = form.get('vocabs') as FormArray;
+    vocabsArray.push(new FormGroup({
+      vocab: new FormControl('123'),
+      desc: new FormControl('123')
+    }));
+    vocabsArray.push(new FormGroup({
+      vocab: new FormControl(null),
+      desc: new FormControl(null)
+    }));
+    expect(component.isFormValid()).toBeFalsy();
+  });
+  it('should return true when form is valid', () => {
+    const form = component.form;
+    form.get('title').setValue('123');
+    const vocabsArray = form.get('vocabs') as FormArray;
+    vocabsArray.controls.forEach(item => {
+      item.get('vocab').setValue('123');
+      item.get('desc').setValue('123');
+    });
+    expect(component.isFormValid()).toBeTruthy();
+  });
+
+  /**
+   * onSubmit related tests
+   */
+  it('should invoke isFormValid when onSubmit is called', () => {
+    const fnc = spyOn(component, 'isFormValid').and.returnValue(true);
+    component.onSubmit();
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should not call postVocab api if isFormValid returns false', () => {
+    component.mode = 'create';
+    fixture.detectChanges();
+    spyOn(component, 'isFormValid').and.returnValue(false);
+    expect(component.vocabService).toBeDefined();
+    const fnc = spyOn(mockVocabService, 'postVocab');
+    component.onSubmit();
+    expect(fnc).not.toHaveBeenCalled();
+  });
+  it('should not call patchVocab api if isFormValid returns false', () => {
+    component.mode = 'update';
+    fixture.detectChanges();
+    spyOn(component, 'isFormValid').and.returnValue(false);
+    expect(component.vocabService).toBeDefined();
+    const fnc = spyOn(mockVocabService, 'patchVocab');
+    component.onSubmit();
+    expect(fnc).not.toHaveBeenCalled();
+  });
+  it('should call postVocab api in create mode if isFormValid returns true', () => {
+    component.mode = 'create';
+    fixture.detectChanges();
+    spyOn(component, 'isFormValid').and.returnValue(true);
+    const postFnc = spyOn(mockVocabService, 'postVocab').and.returnValue(of({}));
+    const patchFnc = spyOn(mockVocabService, 'patchVocab').and.returnValue(of({}));
+    component.onSubmit();
+    expect(postFnc).toHaveBeenCalled();
+    expect(patchFnc).not.toHaveBeenCalled();
+  });
+  it('should call patchVocab api in update mode if isFormValid returns true', () => {
+    component.mode = 'update';
+    fixture.detectChanges();
+    spyOn(component, 'isFormValid').and.returnValue(true);
+    const postFnc = spyOn(mockVocabService, 'postVocab').and.returnValue(of({}));
+    const patchFnc = spyOn(mockVocabService, 'patchVocab').and.returnValue(of({}));
+    component.onSubmit();
+    expect(patchFnc).toHaveBeenCalled();
+    expect(postFnc).not.toHaveBeenCalled();
+  });
+  it('should verify at least one index card onSubmit', () => {});
 });

@@ -6,8 +6,8 @@
 <div class="action-row">
   <h1 class="page-title">{{ title }}</h1>
   <div class="action-btns">
-    <button class="main-btn save-btn" type="button" aria-label="Save">Save</button>
-    <button class="main-btn sub-btn cancel-btn" type="button" aria-label="Cancel">Cancel</button>
+    <button (click)="onSubmit()" class="main-btn save-btn" type="button" aria-label="Save">Save</button>
+    <button (click)="onCancel()" class="main-btn sub-btn cancel-btn" type="button" aria-label="Cancel">Cancel</button>
   </div>
 </div><!-- End of action row -->
 <!-- New button -->
@@ -16,7 +16,7 @@
 </button><!-- End of new button -->
 <!-- Content -->
 <section class="content">
-  <form [formGroup]="form">
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <!-- Title -->
     <div class="ctrl-wrapper --title">
       <label for="title" class="ctrl-title">Title</label>
