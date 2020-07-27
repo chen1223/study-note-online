@@ -10,10 +10,6 @@
     <button (click)="onCancel()" class="main-btn sub-btn cancel-btn" type="button" aria-label="Cancel">Cancel</button>
   </div>
 </div><!-- End of action row -->
-<!-- New button -->
-<button class="main-btn round-btn new-btn" type="button" aria-label="new vocab" (click)="addVocab()">
-  <fa-icon class="__icon" [icon]="['fa', 'plus']" aria-label="Back"></fa-icon>
-</button><!-- End of new button -->
 <!-- Main Content -->
 <section class="main-content">
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
@@ -22,9 +18,5 @@
       <label for="title" class="ctrl-title">Title</label>
       <input type="text" class="ctrl title-ctrl underline" formControlName="title">
     </div><!-- End of title -->
-    <!-- Index card section -->
-    <div class="index-card-wrapper">
-      <app-index-card [mode]="mode" [vocabs]="form.get('vocabs')"></app-index-card>
-    </div><!-- End of index card section -->
   </form>
 </section><!-- End of main content -->

@@ -15,8 +15,11 @@ input {
     font-size: 1.2em;
     border: none;
     background: none;
-    border-bottom: 1px solid gray;
+    border-bottom: 2px solid gray;
     outline: none;
     padding: 0 .5em;
+  }
+  &.ng-invalid.ng-touched {
+    border-color: $red;
   }
 }

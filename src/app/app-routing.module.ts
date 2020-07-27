@@ -10,6 +10,10 @@ export const routes: Routes = [
   {
     path: 'vocab',
     loadChildren: () => import('./vocab/vocab.module').then(m => m.VocabModule)
+  },
+  {
+    path: 'note',
+    loadChildren: () => import('./note/note.module').then(m => m.NoteModule)
   }
 ];
 
