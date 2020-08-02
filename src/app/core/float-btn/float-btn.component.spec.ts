@@ -92,4 +92,13 @@ describe('FloatBtnComponent', () => {
     const updatedEl = fixture.debugElement.query(By.css('.action-box'));
     expect(updatedEl).toBeFalsy();
   }));
+
+  it('should close the float button on link click', () => {
+    component.isOpen = true;
+    fixture.detectChanges();
+    const link = fixture.debugElement.query(By.css('.--vocab .link'));
+    link.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    expect(component.isOpen).toBeFalsy();
+  });
 });

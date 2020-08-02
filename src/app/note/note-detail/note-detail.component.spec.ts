@@ -8,6 +8,7 @@ import { of } from 'rxjs/internal/observable/of';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormBuilder, FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { QuillModule } from 'ngx-quill';
 
 class MockActivatedRoute {
   data = of({
@@ -29,6 +30,7 @@ describe('NoteDetailComponent', () => {
         ShareModule,
         FormsModule,
         ReactiveFormsModule,
+        QuillModule.forRoot(),
         RouterTestingModule.withRoutes([
           {
             path: 'note/new',
@@ -241,5 +243,20 @@ describe('NoteDetailComponent', () => {
     const fnc = spyOn(component, 'onSubmit').and.callFake(() => {});
     form.triggerEventHandler('submit', null);
     expect(fnc).toHaveBeenCalled();
+  });
+
+  /**
+   * Editable section related tests
+   */
+  it('should define toolbarConfig', () => {
+    expect(component.toolbarConfig).toBeTruthy();
+  });
+  it('should set QuillEditor toolbar after view init', () => {
+    expect(component.setQuillEditor).toBeTruthy();
+    const fnc = spyOn(component, 'setQuillEditor');
+    component.ngAfterViewInit();
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalled();
+    expect(component.quillEditor.modules.toolbar).toBe(component.toolbarConfig);
   });
 });

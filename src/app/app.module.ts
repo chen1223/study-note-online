@@ -11,7 +11,8 @@ import { faGraduationCap,
          faAngleLeft,
          faPlus,
          faUndo,
-         faTimes } from '@fortawesome/free-solid-svg-icons';
+         faTimes,
+         faTint } from '@fortawesome/free-solid-svg-icons';
 import { faFacebookSquare } from '@fortawesome/free-brands-svg-icons';
 import { ShareModule } from './share/share.module';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
@@ -44,7 +45,8 @@ export class AppModule {
      faAngleLeft,
      faPlus,
      faUndo,
-     faTimes].forEach(icon => {
+     faTimes,
+     faTint].forEach(icon => {
       library.add(icon);
     });
   }

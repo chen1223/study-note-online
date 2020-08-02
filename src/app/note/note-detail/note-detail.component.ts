@@ -1,20 +1,48 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
+import { QuillEditorComponent, QuillToolbarConfig } from 'ngx-quill';
 
 @Component({
   selector: 'app-note-detail',
   templateUrl: './note-detail.component.html',
   styleUrls: ['./note-detail.component.scss']
 })
-export class NoteDetailComponent implements OnInit {
+export class NoteDetailComponent implements OnInit, AfterViewInit {
 
   mode: string;
   title: string;
+
+  toolbarConfig: QuillToolbarConfig = [
+    [
+      'bold', 'italic', 'underline', 'strike',
+      {
+        color: [
+          '#000',
+          '#49C9DD',
+          '#FF7C7C',
+          '#49DDA2'
+        ]
+      },
+      {
+        background: [
+          '#49C9DD',
+          '#FF7C7C',
+          '#49DDA2'
+        ]
+      },
+      'clean'
+    ]
+  ];
+
+  // Current ink color: black, red, blue
+  currentColor = 'black';
   form = this.fb.group({
     title: ['', [Validators.required]]
   });
+
+  @ViewChild('quillEditor') quillEditor: QuillEditorComponent;
 
   constructor(public readonly location: Location,
               public readonly activatedRoute: ActivatedRoute,
@@ -22,6 +50,17 @@ export class NoteDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.setMode();
+  }
+
+  ngAfterViewInit(): void {
+    this.setQuillEditor();
+  }
+
+  setQuillEditor(): void {
+    this.quillEditor.modules = {
+      toolbar: this.toolbarConfig
+    };
+    this.quillEditor.placeholder = '';
   }
 
   /**
@@ -38,7 +77,6 @@ export class NoteDetailComponent implements OnInit {
             const titleEl = document.querySelector('.--title .ctrl') as HTMLInputElement;
             titleEl.focus();
           }, 0);
-          break;
           break;
         case 'view':
           this.title = 'View Note';

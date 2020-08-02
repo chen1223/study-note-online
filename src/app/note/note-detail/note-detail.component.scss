@@ -1,0 +1,61 @@
+@import '../../share/controls.scss';
+@import '../../share/variable.scss';
+
+/** Color button **/
+.color-btn {
+  position: fixed;
+  right: 2em;
+  bottom: 15%;
+  z-index: 500;
+  .__icon {
+    font-size: 1.4em;
+  }
+}
+/* Note section styling */
+.note-wrapper {
+  background: $white;
+  padding: 1.5em 0;
+  margin-top: 3em;
+  position: relative;
+}
+$lineHeight: 2.5em;
+::ng-deep {
+  .note-wrapper {
+    .ql-toolbar.ql-snow {
+      border: none;
+    }
+    .ql-container.ql-snow {
+      border: none;
+    }
+    .ql-toolbar {
+      width: calc(100% - 5em);
+      margin: auto;
+      padding: 0;
+      position: sticky;
+      top: -.25em;
+      background: $white;
+      z-index: 1;
+      height: 2em;
+      align-items: center;
+    }
+    .ql-format {
+      margin-right: 0;
+    }
+    .ql-editor {
+      min-height: 500px;
+      background: linear-gradient(to bottom, transparent, transparent calc(#{$lineHeight} - 2px), $lineColor 0px);
+      background-size: 100% $lineHeight;
+      background-position-y: calc(#{$lineHeight} - 7px);
+      width: calc(100% - 6em);
+      margin: auto;
+      line-height: $lineHeight;
+      outline: none;
+      padding: 0 1em;
+      &.ng-invalid.ng-touched {
+        background: linear-gradient(to bottom, transparent, transparent calc(#{$lineHeight} - 7px), $red 0px);
+        background-size: 100% $lineHeight;
+        background-position-y: calc(#{$lineHeight} - 7px);
+      }
+    }
+  }
+}

@@ -6,17 +6,19 @@ import { MaterialModule } from './../share/material.module';
 import { NoteDetailComponent } from './note-detail/note-detail.component';
 import { ShareModule } from '../share/share.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { QuillModule } from 'ngx-quill';
 
 
 @NgModule({
   declarations: [NoteDetailComponent],
   imports: [
-  CommonModule,
+    CommonModule,
     NoteRoutingModule,
     MaterialModule,
     ShareModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    QuillModule.forRoot()
   ]
 })
 export class NoteModule { }

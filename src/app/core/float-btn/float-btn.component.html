@@ -5,13 +5,13 @@
         'shown': isOpen
       }">
     <li class="action-btn round-btn --vocab">
-      <a routerLink="/vocab/new" class="link" aria-label="new vocab">Vocab</a>
+      <a (click)="toggleOpen()" routerLink="/vocab/new" class="link" aria-label="new vocab">Vocab</a>
     </li>
     <li class="action-btn round-btn --note">
-      <a routerLink="/note/new" class="link" aria-label="new note">Note</a>
+      <a (click)="toggleOpen()" routerLink="/note/new" class="link" aria-label="new note">Note</a>
     </li>
     <li class="action-btn round-btn --book">
-      <a routerLink="/book/new" class="link" aria-label="new book">Book</a>
+      <a (click)="toggleOpen()" routerLink="/book/new" class="link" aria-label="new book">Book</a>
     </li>
   </ul>
   <button class="main-btn round-btn pen__btn"
