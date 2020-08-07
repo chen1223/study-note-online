@@ -10,6 +10,20 @@ const routes: Routes = [
     data: {
       mode: 'create'
     }
+  },
+  {
+    path: 'view/:id',
+    component: VocabDetailComponent,
+    data: {
+      mode: 'view'
+    }
+  },
+  {
+    path: 'update/:id',
+    component: VocabDetailComponent,
+    data: {
+      mode: 'update'
+    }
   }
 ];
 

@@ -10,7 +10,9 @@ import { QuillModule } from 'ngx-quill';
 
 
 @NgModule({
-  declarations: [NoteDetailComponent],
+  declarations: [
+    NoteDetailComponent
+  ],
   imports: [
     CommonModule,
     NoteRoutingModule,

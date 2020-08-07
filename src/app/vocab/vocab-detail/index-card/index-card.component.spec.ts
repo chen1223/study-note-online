@@ -203,4 +203,22 @@ describe('IndexCardComponent', () => {
     const removeBtns = fixture.debugElement.queryAll(By.css('.remove-btn'));
     expect(removeBtns.length).toEqual(0);
   });
+  it('should not show remove button in view mode', () => {
+    component.vocabs = new FormArray([
+      new FormGroup({
+        vocab: new FormControl('vocab1'),
+        desc: new FormControl('123'),
+        frontOnTop: new FormControl(true)
+      }),
+      new FormGroup({
+        vocab: new FormControl('vocab1'),
+        desc: new FormControl('123'),
+        frontOnTop: new FormControl(true)
+      })
+    ]);
+    component.mode = 'view';
+    fixture.detectChanges();
+    const removeBtns = fixture.debugElement.queryAll(By.css('.remove-btn'));
+    expect(removeBtns.length).toEqual(0);
+  });
 });

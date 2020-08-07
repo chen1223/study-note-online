@@ -11,7 +11,7 @@
       <fa-icon class="__icon" [icon]="['fa', 'undo']" aria-label="flip card"></fa-icon>
     </button><!-- End of Flip button -->
     <!-- Remove button -->
-    <button *ngIf="vocabs.controls.length > 1"
+    <button *ngIf="vocabs.controls.length > 1 && mode !== 'view'"
             class="remove-btn round-btn sub-btn"
             type="button"
             aria-label="remove card"

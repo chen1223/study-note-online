@@ -12,7 +12,38 @@ import { of, Observable } from 'rxjs';
 import { IndexCardComponent } from './index-card/index-card.component';
 import { VocabService } from './../vocab.service';
 import { HttpClientModule } from '@angular/common/http';
+import * as moment from 'moment';
 
+const dummyVocabData = {
+  id: 1,
+  title: 'Test vocab title',
+  publishedDate: '2020/06/13',
+  likes: 103,
+  saves: 50,
+  author: {
+    name: 'Bill Chen',
+    username: 'billchen',
+    profilePic: 'https://images.unsplash.com/photo-1522039553440-46d3e1e61e4a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=200&q=60'
+  },
+  vocabs: [
+    {
+      vocab: 'micronda',
+      desc: 'noun. microwave'
+    },
+    {
+      vocab: 'televición',
+      desc: 'noun. television'
+    },
+    {
+      vocab: 'ordenador',
+      desc: 'noun. computer'
+    },
+    {
+      vocab: 'patalla',
+      desc: 'noun. monitor'
+    }
+  ]
+};
 
 @Component({
   selector: 'app-breadcrumb',
@@ -24,9 +55,15 @@ class MockActivatedRoute {
   data = of({
     mode: 'create'
   });
+  paramMap = of({
+    get: () => {}
+  });
 }
 
 class MockVocabService {
+  getVocabPack(id): Observable<object> {
+    return of({ data: dummyVocabData });
+  }
   postVocab(body): Observable<object> {
     return of({});
   }
@@ -119,6 +156,8 @@ describe('VocabDetailComponent', () => {
     mockVocabService = TestBed.inject(VocabService);
     mockHttp = TestBed.inject(HttpTestingController);
     (component.form.get('vocabs') as FormArray).clear();
+    // Set default mode to create
+    component.mode = 'create';
     fixture.detectChanges();
   });
 
@@ -204,32 +243,145 @@ describe('VocabDetailComponent', () => {
   }));
 
   /**
+   * getVocab function related tests
+   */
+  it('should define getVocab function', () => {
+    expect(component.getVocab).toBeDefined();
+  });
+  it('should call getVocabPack service when getVocab is called', fakeAsync(() => {
+    const api = spyOn(mockVocabService, 'getVocabPack').and.returnValue(of({ 'data': {} }));
+    const dummyId = 1;
+    mockActivatedRoute.paramMap = of({ get: () => { return dummyId; } });
+    component.getVocab(dummyId);
+    fixture.detectChanges();
+    expect(api).toHaveBeenCalledWith(dummyId);
+  }));
+  it('should call resetForm and clear vocabs array when getVocab is called', fakeAsync(() => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    component.setMode();
+    fixture.detectChanges();
+    const fnc = spyOn(component, 'resetForm');
+    component.addVocab();
+    fixture.detectChanges();
+    component.getVocab(1);
+    tick();
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalled();
+    expect((component.form.get('vocabs') as FormArray).length).toEqual(dummyVocabData.vocabs.length);
+  }));
+  it('should set form data after getVocab is called', fakeAsync(() => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    component.setMode();
+    const form = component.form;
+    form.reset();
+    fixture.detectChanges();
+    component.getVocab(1);
+    tick();
+    fixture.detectChanges();
+    expect(form.get('title').value).toEqual(dummyVocabData.title);
+    expect((form.get('vocabs') as FormArray).length).toEqual(dummyVocabData.vocabs.length);
+    expect(form.get('publishedDate').value).toEqual(dummyVocabData.publishedDate);
+    const formattedDate = moment(new Date(dummyVocabData.publishedDate)).format('MMM DD, YYYY');
+    expect(form.get('_publishedDate').value).toEqual(formattedDate);
+    expect(form.get('likes').value).toEqual(dummyVocabData.likes);
+    expect(form.get('saves').value).toEqual(dummyVocabData.saves);
+    expect((form.get('author') as FormGroup).get('name').value).toEqual(dummyVocabData.author.name);
+    expect((form.get('author') as FormGroup).get('username').value).toEqual(dummyVocabData.author.username);
+    expect((form.get('author') as FormGroup).get('profilePic').value).toEqual(dummyVocabData.author.profilePic);
+  }));
+
+
+  /**
    * View mode related tests
    */
   it('should set mode to view mode when the url has the view keyword', fakeAsync(() => {
     mockActivatedRoute.data = of({ mode: 'view' });
+    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    router.navigateByUrl('vocab/view/1');
     component.ngOnInit();
     fixture.detectChanges();
     // View mode test
-    router.navigateByUrl('vocab/view/1');
     tick();
     fixture.detectChanges();
     expect(component.mode).toEqual('view');
   }));
+  it('should call getVocab function in view mode', fakeAsync(() => {
+    const fnc = spyOn(component, 'getVocab').and.callFake(() => {});
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    fixture.detectChanges();
+    tick();
+    expect(fnc).toHaveBeenCalled();
+  }));
+  it('should store vocab id in view mode', () => {
+    expect(component.vocabId).toBeTruthy;
+    mockActivatedRoute.data = of({ mode: 'view' });
+    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    router.navigateByUrl('vocab/view/1');
+    component.ngOnInit();
+    expect(component.vocabId).toEqual(1);
+  });
+  it('should disable form in view mode', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    router.navigateByUrl('vocab/view/1');
+    component.ngOnInit();
+    fixture.detectChanges();
+    expect(component.form.disabled).toBeTruthy();
+  });
+  it('should not show action buttons in view mode', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    router.navigateByUrl('vocab/view/1');
+    component.ngOnInit();
+    fixture.detectChanges();
+    const actionBtns = fixture.debugElement.query(By.css('.action-btns'));
+    expect(actionBtns).toBeFalsy();
+  });
+  it('should not show title FormControl in view mode', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    router.navigateByUrl('vocab/view/1');
+    component.ngOnInit();
+    fixture.detectChanges();
+    const ctrl = fixture.debugElement.query(By.css('.title-ctrl'));
+    expect(ctrl).toBeFalsy();
+  });
 
   /**
    * Update mode related test
    */
   it('should mode to update mode when the url has the update mode keyword', fakeAsync(() => {
     mockActivatedRoute.data = of({ mode: 'update' });
+    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    router.navigateByUrl('vocab/update/1');
     component.ngOnInit();
     fixture.detectChanges();
     // Update mode test
-    router.navigateByUrl('vocab/update/1');
     tick();
     fixture.detectChanges();
     expect(component.mode).toEqual('update');
   }));
+  it('should call getVocab function in update mode', fakeAsync(() => {
+    const fnc = spyOn(component, 'getVocab').and.callFake(() => {});
+    mockActivatedRoute.data = of({ mode: 'update' });
+    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    router.navigateByUrl('vocab/update/1');
+    component.ngOnInit();
+    fixture.detectChanges();
+    tick();
+    expect(fnc).toHaveBeenCalled();
+  }));
+  it('should store vocab id in update mode', () => {
+    expect(component.vocabId).toBeTruthy;
+    mockActivatedRoute.data = of({ mode: 'update' });
+    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    router.navigateByUrl('vocab/update/1');
+    component.ngOnInit();
+    expect(component.vocabId).toEqual(1);
+  });
 
   /**
    * Back button related tests
@@ -290,25 +442,95 @@ describe('VocabDetailComponent', () => {
     expect(titleEl.nativeElement.innerText).toEqual('New Vocabulary Pack');
     expect(component.title).toEqual('New Vocabulary Pack');
   });
-  it('should have page title: View Vocabulary Pack in view mode', () => {
+  it('should fill in page title in view mode', () => {
     mockActivatedRoute.data = of({ mode: 'view' });
+    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    router.navigateByUrl('vocab/view/1');
     component.ngOnInit();
     fixture.detectChanges();
     const titleEl = fixture.debugElement.query(By.css('.page-title'));
-    expect(component.title).toBeDefined();
     expect(titleEl).toBeTruthy();
-    expect(titleEl.nativeElement.innerText).toEqual('View Vocabulary Pack');
-    expect(component.title).toEqual('View Vocabulary Pack');
+    expect(titleEl.nativeElement.innerText).toEqual(dummyVocabData.title);
   });
-  it('should have page title: Update Vocabulary Pack in update mode', () => {
+  it('should not have page title in update mode', () => {
     mockActivatedRoute.data = of({ mode: 'update' });
     component.ngOnInit();
     fixture.detectChanges();
     const titleEl = fixture.debugElement.query(By.css('.page-title'));
-    expect(component.title).toBeDefined();
-    expect(titleEl).toBeTruthy();
-    expect(titleEl.nativeElement.innerText).toEqual('Update Vocabulary Pack');
-    expect(component.title).toEqual('Update Vocabulary Pack');
+    expect(titleEl).toBeFalsy();
+  });
+
+  /**
+   * Detail section related tests
+   */
+  it('should have detail section in view and update mode', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    fixture.detectChanges();
+    const detailSecInView = fixture.debugElement.query(By.css('.detail-section'));
+    expect(detailSecInView).toBeTruthy();
+
+    mockActivatedRoute.data = of({ mode: 'update' });
+    component.setMode();
+    fixture.detectChanges();
+    const detailInUpdate = fixture.debugElement.query(By.css('.detail-section'));
+    expect(detailInUpdate).toBeTruthy();
+
+    mockActivatedRoute.data = of({ mode: 'create' });
+    component.setMode();
+    fixture.detectChanges();
+    const detailInCreate = fixture.debugElement.query(By.css('.detail-section'));
+    expect(detailInCreate).toBeFalsy();
+  });
+  it('should have author profile link', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    fixture.detectChanges();
+    const link = fixture.debugElement.query(By.css('.author-link'));
+    expect(link).toBeTruthy();
+    const icon = fixture.debugElement.query(By.css('.author-link .avatar'));
+    expect(icon).toBeTruthy();
+    const name = fixture.debugElement.query(By.css('.author-link .name'));
+    expect(name).toBeTruthy();
+  });
+  it('should have like button', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    fixture.detectChanges();
+    const likeBtn = fixture.debugElement.query(By.css('.--like-btn'));
+    expect(likeBtn).toBeTruthy();
+  });
+  it('should have save button', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    fixture.detectChanges();
+    const saveBtn = fixture.debugElement.query(By.css('.--save-btn'));
+    expect(saveBtn).toBeTruthy();
+  });
+  it('should have date', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    fixture.detectChanges();
+    const date = fixture.debugElement.query(By.css('.date'));
+    expect(date).toBeTruthy();
+  });
+  it('should call onLike function when like button is clicked', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    fixture.detectChanges();
+    const fnc = spyOn(component, 'onLike').and.callFake(() => {});
+    const btn = fixture.debugElement.query(By.css('.--like-btn'));
+    btn.triggerEventHandler('click', null);
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should call onSave function when save button is clicked', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    fixture.detectChanges();
+    const fnc = spyOn(component, 'onSave').and.callFake(() => {});
+    const btn = fixture.debugElement.query(By.css('.--save-btn'));
+    btn.triggerEventHandler('click', null);
+    expect(fnc).toHaveBeenCalled();
   });
 
   /**
@@ -322,8 +544,9 @@ describe('VocabDetailComponent', () => {
     expect(el).toBeTruthy();
   });
   it('should define a FormControl called title with required validation', () => {
-    expect(component.form.get('title')).toBeTruthy();
-    expect(component.form.get('title')).toBeInstanceOf(FormControl);
+    const ctrl = component.form.get('title');
+    expect(ctrl).toBeTruthy();
+    expect(ctrl).toBeInstanceOf(FormControl);
     const el = fixture.debugElement.query(By.css('.title-ctrl'));
     expect(el).toBeTruthy();
 
@@ -335,6 +558,40 @@ describe('VocabDetailComponent', () => {
   it('should define a FormArray called vocabs', () => {
     const formArray = component.form.get('vocabs');
     expect(formArray).toBeTruthy();
+  });
+  it('should define a FormControl called publishedDate', () => {
+    const ctrl = component.form.get('publishedDate');
+    expect(ctrl).toBeTruthy();
+    expect(ctrl).toBeInstanceOf(FormControl);
+  });
+  it('should define a FormControl called _publishedDate', () => {
+    const ctrl = component.form.get('_publishedDate');
+    expect(ctrl).toBeTruthy();
+    expect(ctrl).toBeInstanceOf(FormControl);
+  });
+  it('should define a FormControl called likes', () => {
+    const ctrl = component.form.get('likes');
+    expect(ctrl).toBeTruthy();
+    expect(ctrl).toBeInstanceOf(FormControl);
+  });
+  it('should define a FormControl called saves', () => {
+    const ctrl = component.form.get('saves');
+    expect(ctrl).toBeTruthy();
+    expect(ctrl).toBeInstanceOf(FormControl);
+  });
+  it('should define a FormGroup called author', () => {
+    const group = component.form.get('author');
+    expect(group).toBeTruthy();
+    expect(group).toBeInstanceOf(FormGroup);
+    const nameCtrl = (group as FormGroup).get('name');
+    const usernameCtrl = (group as FormGroup).get('username');
+    const picCtrl = (group as FormGroup).get('profilePic');
+    expect(nameCtrl).toBeTruthy();
+    expect(nameCtrl).toBeInstanceOf(FormControl);
+    expect(usernameCtrl).toBeTruthy();
+    expect(usernameCtrl).toBeInstanceOf(FormControl);
+    expect(picCtrl).toBeTruthy();
+    expect(picCtrl).toBeInstanceOf(FormControl);
   });
   it('should initialize 1 item in vocabs formarray in create mode', () => {
     mockActivatedRoute.data = of({ mode: 'create' });
@@ -366,6 +623,7 @@ describe('VocabDetailComponent', () => {
     expect(vocabArray.length).toBe(1);
   });
   it('should set focus to the new index card on addVocab called', fakeAsync(() => {
+    component.mode = 'create';
     component.addVocab();
     fixture.detectChanges();
     tick();
@@ -373,12 +631,27 @@ describe('VocabDetailComponent', () => {
     expect(document.activeElement).toBe(lastCard.nativeElement);
   }));
   it('should not set focus to the new index card addVocab is called and false is passed', fakeAsync(() => {
+    component.mode = 'create';
     component.addVocab(false);
     fixture.detectChanges();
     tick();
     const focusedEl = fixture.debugElement.query(By.css(':focus'));
     expect(focusedEl).toBeNull();
   }));
+  it('should add vocab to form array and set data if data is passed', () => {
+    const dummyVocab = {
+      vocab: 'test',
+      desc: 'test desc'
+    };
+    const vocabArray = component.form.get('vocabs') as FormArray
+    vocabArray.clear();
+    component.addVocab(false, dummyVocab);
+    fixture.detectChanges();
+    expect(vocabArray.length).toBe(1);
+    const firstItem = vocabArray.at(0) as FormGroup;
+    expect(firstItem.get('vocab').value).toEqual(dummyVocab.vocab);
+    expect(firstItem.get('desc').value).toEqual(dummyVocab.desc);
+  });
 
   /**
    * New button related tests
@@ -402,6 +675,15 @@ describe('VocabDetailComponent', () => {
     expect(fnc).toHaveBeenCalled();
     expect(vocabArray.length).toBe(1);
   });
+  it('should not show new vocab button in view mode', fakeAsync(() => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    component.setMode();
+    tick();
+    fixture.detectChanges();
+    const el = fixture.debugElement.query(By.css('.new-btn'));
+    expect(el).toBeFalsy();
+  }));
 
   /**
    * Index card integration related tests

@@ -19,6 +19,13 @@ describe('VocabService', () => {
     httpMock = TestBed.inject(HttpTestingController);
   });
 
+  /**
+   * Get vocabs related tests
+   */
+  it('should have getVocabPack function', () => {
+    expect(service.getVocabPack).toBeDefined();
+  });
+
   it('should have postVocab function', fakeAsync(() => {
     expect(service.postVocab).toBeDefined();
   }));
@@ -26,4 +33,5 @@ describe('VocabService', () => {
   it('should have patchVocab function', fakeAsync(() => {
     expect(service.patchVocab).toBeDefined();
   }));
+
 });

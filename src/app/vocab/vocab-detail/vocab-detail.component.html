@@ -3,22 +3,50 @@
   Back
 </a>
 <!-- Action row -->
-<div class="action-row">
-  <h1 class="page-title">{{ title }}</h1>
-  <div class="action-btns">
+<div class="action-row"
+  [ngClass]="{
+    '--view-mode': mode === 'view'
+  }">
+  <h1 class="page-title" *ngIf="mode !== 'update'">{{ title }}</h1>
+  <div class="action-btns" *ngIf="mode !== 'view'">
     <button (click)="onSubmit()" class="main-btn save-btn" type="button" aria-label="Save">Save</button>
     <button (click)="onCancel()" class="main-btn sub-btn cancel-btn" type="button" aria-label="Cancel">Cancel</button>
   </div>
 </div><!-- End of action row -->
+<!-- Detail section -->
+<section class="detail-section" *ngIf="mode !== 'create'">
+  <!-- Author -->
+  <a class="author-link" [routerLink]="form.get('author').value ? '/profile/' + form.get('author')?.get('username')?.value : ''">
+    <img [src]="form.get('author')?.get('profilePic')?.value" [alt]="form.get('author')?.get('name')?.value" class="avatar">
+    <span class="name">{{ form.get('author')?.get('name')?.value }}</span>
+  </a><!-- End of author -->
+  <!-- Metadata -->
+  <div class="metadata">
+    <!-- Like button -->
+    <button class="meta-btn --like-btn" aria-label="Like" type="button" (click)="onLike()">
+      <fa-icon class="__icon" [icon]="['far', 'thumbs-up']" aria-label="Like"></fa-icon>
+      <span class="count-title">Like </span>
+      <span class="count">{{ form.get('likes')?.value }}</span>
+    </button><!-- End of like button -->
+    <!-- Save button -->
+    <button class="meta-btn --save-btn" aria-label="Save" type="button" (click)="onSave()">
+      <fa-icon class="__icon" [icon]="['far', 'bookmark']" aria-label="Save"></fa-icon>
+      <span class="count-title">Save </span>
+      <span class="count">{{ form.get('saves')?.value }}</span>
+    </button><!-- End of save button -->
+    <!-- Date -->
+    <span class="date">{{ form.get('_publishedDate').value }}</span><!-- End of date -->
+  </div><!-- End of metadata -->
+</section><!-- End of detail section -->
 <!-- New button -->
-<button class="main-btn round-btn new-btn" type="button" aria-label="new vocab" (click)="addVocab()">
+<button *ngIf="mode !== 'view'" class="main-btn round-btn new-btn" type="button" aria-label="new vocab" (click)="addVocab()">
   <fa-icon class="__icon" [icon]="['fa', 'plus']" aria-label="new vocab"></fa-icon>
 </button><!-- End of new button -->
 <!-- Main Content -->
 <section class="main-content">
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <!-- Title -->
-    <div class="ctrl-wrapper --title">
+    <div class="ctrl-wrapper --title" *ngIf="mode !== 'view'">
       <label for="title" class="ctrl-title">Title</label>
       <input type="text" class="ctrl title-ctrl underline" formControlName="title">
     </div><!-- End of title -->
