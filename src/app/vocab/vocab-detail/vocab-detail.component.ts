@@ -187,8 +187,8 @@ export class VocabDetailComponent implements OnInit {
     const titleCtrl = this.form.get('title');
     let titleValid = false;
     if (!titleCtrl.value) {
-      const titleCtrl = document.querySelector('input.title-ctrl') as HTMLInputElement;
-      titleCtrl.focus();
+      const titleInput = document.querySelector('input.title-ctrl') as HTMLInputElement;
+      titleInput.focus();
       return titleValid;
     }
     titleValid = true;
