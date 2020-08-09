@@ -1,7 +1,9 @@
 @import '../../share/controls.scss';
+@import '../../share/variable.scss';
 
 .main-content {
   margin: 2em 0;
+  padding-bottom: 2em;
 }
 .--view-mode {
   .page-title {
@@ -46,9 +48,24 @@
   outline: none;
   margin-left: 1rem;
   cursor: pointer;
+  &.hover {
+    .__icon.--normal {
+      display: none;
+    }
+    .__icon.--hover {
+      display: inline;
+    }
+    .count-title, .count {
+      color: $red;
+    }
+  }
   .__icon {
     font-size: 1.1rem;
     margin-right: .5rem;
+    &.--hover {
+      display: none;
+      color: $red;
+    }
   }
   .count-title {
     font-size: .9rem;
@@ -62,6 +79,10 @@
   margin-left: 1rem;
   font-size: .9rem;
 }
+/** Mode button **/
+.mode-row {
+  text-align: right;
+}
 /** New button **/
 .new-btn {
   position: fixed;
@@ -72,6 +93,10 @@
     font-size: 1em;
   }
 }
+.index-card-wrapper {
+  padding-bottom: 2em;
+  margin-bottom: 2em;
+}
 @media (min-width: 1400px) {
   .new-btn {
     right: 6em;
@@ -80,5 +105,53 @@
 @media (min-width: 1200px) and (max-width: 1399px) {
   .new-btn {
     right: 5em;
+  }
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .--presentation .index-card-wrapper {
+    margin-top: 15%;
+  }
+}
+@media (min-width: 481px) and (max-width: 767px) {
+  .main-content {
+    &.--presentation {
+      margin: 4em 0;
+    }
+  }
+  .--presentation .index-card-wrapper {
+    margin-top: 15%;
+  }
+  .new-btn {
+    bottom: 20%;
+  }
+}
+@media (max-width: 480px) {
+  .main-content {
+    &.--presentation {
+      margin: 4em 0;
+    }
+  }
+  .new-btn {
+    bottom: 20%;
+  }
+  .detail-section {
+    display: block;
+    margin-bottom: 2rem;
+    .metadata {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+      .meta-btn,
+      .date {
+        margin: auto 0;
+      }
+    }
+  }
+}
+@media (orientation: landscape) {
+  @media (min-width: 1300px) {
+    .--presentation .index-card-wrapper {
+      margin-top: 15%;
+    }
   }
 }

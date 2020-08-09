@@ -9,10 +9,13 @@ import { faGraduationCap,
          faSearch,
          faPen,
          faAngleLeft,
+         faAngleRight,
          faPlus,
          faUndo,
          faTimes,
-         faTint } from '@fortawesome/free-solid-svg-icons';
+         faTint,
+         faThumbsUp as thumbsUp,
+         faBookmark as bookmark } from '@fortawesome/free-solid-svg-icons';
 import { faFacebookSquare } from '@fortawesome/free-brands-svg-icons';
 import { faThumbsUp, faBookmark } from '@fortawesome/free-regular-svg-icons';
 import { ShareModule } from './share/share.module';
@@ -44,12 +47,15 @@ export class AppModule {
      faPen,
      faFacebookSquare,
      faAngleLeft,
+     faAngleRight,
      faPlus,
      faUndo,
      faTimes,
      faTint,
      faThumbsUp,
-     faBookmark].forEach(icon => {
+     faBookmark,
+     thumbsUp,
+     bookmark].forEach(icon => {
       library.add(icon);
     });
   }

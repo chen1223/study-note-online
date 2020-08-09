@@ -23,14 +23,30 @@
   <!-- Metadata -->
   <div class="metadata">
     <!-- Like button -->
-    <button class="meta-btn --like-btn" aria-label="Like" type="button" (click)="onLike()">
-      <fa-icon class="__icon" [icon]="['far', 'thumbs-up']" aria-label="Like"></fa-icon>
+    <button
+      class="meta-btn --like-btn"
+      [class.hover]="likeHovered"
+      (mouseover)="likeHovered=true"
+      (mouseout)="likeHovered=false"
+      aria-label="Like"
+      type="button"
+      (click)="onLike()">
+      <fa-icon class="__icon --normal" [icon]="['far', 'thumbs-up']" aria-label="Like"></fa-icon>
+      <fa-icon class="__icon --hover" [icon]="['fa', 'thumbs-up']" aria-label="Like"></fa-icon>
       <span class="count-title">Like </span>
       <span class="count">{{ form.get('likes')?.value }}</span>
     </button><!-- End of like button -->
     <!-- Save button -->
-    <button class="meta-btn --save-btn" aria-label="Save" type="button" (click)="onSave()">
-      <fa-icon class="__icon" [icon]="['far', 'bookmark']" aria-label="Save"></fa-icon>
+    <button
+      class="meta-btn --save-btn"
+      [class.hover]="saveHovered"
+      (mouseover)="saveHovered=true"
+      (mouseout)="saveHovered=false"
+      aria-label="Save"
+      type="button"
+      (click)="onSave()">
+      <fa-icon class="__icon --normal" [icon]="['far', 'bookmark']" aria-label="Save"></fa-icon>
+      <fa-icon class="__icon --hover" [icon]="['fa', 'bookmark']" aria-label="Save"></fa-icon>
       <span class="count-title">Save </span>
       <span class="count">{{ form.get('saves')?.value }}</span>
     </button><!-- End of save button -->
@@ -38,12 +54,25 @@
     <span class="date">{{ form.get('_publishedDate').value }}</span><!-- End of date -->
   </div><!-- End of metadata -->
 </section><!-- End of detail section -->
+<!-- Mode row -->
+<section class="mode-row">
+  <button
+    class="main-btn mode-btn"
+    type="button"
+    (click)="presentationMode = !presentationMode"
+    [attr.aria-label]="presentationMode ? 'Show All' : 'Presentation Mode'">
+    {{ presentationMode ? 'Show All' : 'Presentation Mode' }}
+  </button>
+</section><!-- End of mode row -->
 <!-- New button -->
 <button *ngIf="mode !== 'view'" class="main-btn round-btn new-btn" type="button" aria-label="new vocab" (click)="addVocab()">
   <fa-icon class="__icon" [icon]="['fa', 'plus']" aria-label="new vocab"></fa-icon>
 </button><!-- End of new button -->
 <!-- Main Content -->
-<section class="main-content">
+<section class="main-content"
+  [ngClass]="{
+    '--presentation': presentationMode
+  }">
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <!-- Title -->
     <div class="ctrl-wrapper --title" *ngIf="mode !== 'view'">
@@ -52,7 +81,7 @@
     </div><!-- End of title -->
     <!-- Index card section -->
     <div class="index-card-wrapper">
-      <app-index-card [mode]="mode" [vocabs]="form.get('vocabs')"></app-index-card>
+      <app-index-card [mode]="mode" [presentationMode]="presentationMode" [vocabs]="form.get('vocabs')"></app-index-card>
     </div><!-- End of index card section -->
   </form>
 </section><!-- End of main content -->

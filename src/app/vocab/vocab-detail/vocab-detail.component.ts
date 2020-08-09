@@ -25,11 +25,22 @@ export class VocabDetailComponent implements OnInit {
     })
   });
 
+  // view / update / create
   mode: string;
   title: string;
 
+  /**
+   * Presentation mode:
+   *   true: in presentation mode
+   *   false: in show all mode
+   */
+  presentationMode = false;
+
   // Vocab id
-  vocabId;
+  vocabId = null;
+
+  likeHovered = false;
+  saveHovered = false;
 
   constructor(public readonly location: Location,
               public readonly fb: FormBuilder,

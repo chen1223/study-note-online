@@ -1,3 +1,4 @@
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { async, ComponentFixture, TestBed, fakeAsync, tick, flush } from '@angular/core/testing';
 
 import { NoteDetailComponent } from './note-detail.component';
@@ -29,6 +30,7 @@ describe('NoteDetailComponent', () => {
         MaterialModule,
         ShareModule,
         FormsModule,
+        FontAwesomeModule,
         ReactiveFormsModule,
         QuillModule.forRoot(),
         RouterTestingModule.withRoutes([

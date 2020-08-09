@@ -1,59 +1,116 @@
-<ng-container *ngFor="let item of vocabs.controls;let i = index">
-  <!-- Card wrapper -->
-  <div class="card-wrapper">
-    <!-- Common card title -->
-    <span class="card__title">
-      <ng-container *ngIf="item.get('frontOnTop').value;else backOnTop">Front</ng-container>
-      <ng-template #backOnTop>Back</ng-template>
-    </span>
-    <!-- Flip button -->
-    <button class="flip-btn round-btn main-btn" type="button" aria-label="flip card" (click)="flipCard(i)">
-      <fa-icon class="__icon" [icon]="['fa', 'undo']" aria-label="flip card"></fa-icon>
-    </button><!-- End of Flip button -->
-    <!-- Remove button -->
-    <button *ngIf="vocabs.controls.length > 1 && mode !== 'view'"
-            class="remove-btn round-btn sub-btn"
-            type="button"
-            aria-label="remove card"
-            (click)="onRemoveClick(i)">
-      <fa-icon class="__icon" [icon]="['fa', 'times']" aria-label="remove card"></fa-icon>
-    </button>
-    <div class="card"
-        [formGroup]="item"
-        [ngClass]="{
-          'front': item.get('frontOnTop').value,
-          'back': !item.get('frontOnTop').value
-        }">
-      <!-- Front -->
-      <div class="card__wrapper--front">
-        <div class="card--front">
-          <span class="card__title">Front</span>
-          <!-- Card body -->
-          <div class="card__body">
-            <ng-container *ngIf="mode !== 'view';else viewFront">
-              <input type="text" class="ctrl vocab" formControlName="vocab">
-            </ng-container>
-            <ng-template #viewFront>
-              <span class="vocab">{{ item.get('vocab').value }}</span>
-            </ng-template>
-          </div><!-- End of card body -->
-        </div>
-      </div><!-- End of Front -->
-      <!-- Back -->
-      <div class="card__wrapper--back">
-        <div class="card--back">
-          <span class="card__title">Back</span>
-          <!-- Card body -->
-          <div class="card__body">
-            <ng-container *ngIf="mode !== 'view';else viewBack">
-              <textarea cols="30" rows="10" class="desc" formControlName="desc"></textarea>
-            </ng-container>
-            <ng-template #viewBack>
-              <p class="desc">{{ item.get('desc').value }}</p>
-            </ng-template>
-          </div><!-- End of card body -->
-        </div>
-      </div><!-- End of Back -->
-    </div><!-- End of card -->
-  </div><!-- End of card wrapper -->
-</ng-container>
+<!-- Presentation Mode -->
+<ng-container *ngIf="presentationMode && mode === 'view';else showAll">
+  <!-- Carousel wrapper -->
+  <section class="carousel-wrapper">
+    <!-- Carousel list -->
+    <ul class="carousel-list">
+      <li class="carousel-item"
+          *ngFor="let item of carouselItemArray;let i = index"
+          [ngClass]="{
+            '--selected': i === selectedIndex,
+            '--prev': i === prevIndex,
+            '--next': i === nextIndex
+          }">
+        <!-- Card wrapper -->
+        <div class="card-wrapper --presentation" *ngIf="i === selectedIndex">
+          <div class="card"
+              [ngClass]="{
+                'front': selectedVocab?.frontOnTop,
+                'back': !selectedVocab?.frontOnTop
+              }">
+            <!-- Front -->
+            <div class="card__wrapper--front">
+              <div class="card--front">
+                <!-- Card body -->
+                <div class="card__body">
+                  <span class="vocab">{{ selectedVocab?.vocab }}</span>
+                </div><!-- End of card body -->
+              </div>
+            </div><!-- End of Front -->
+            <!-- Back -->
+            <div class="card__wrapper--back">
+              <div class="card--back">
+                <!-- Card body -->
+                <div class="card__body">
+                  <p class="desc">{{ selectedVocab?.desc }}</p>
+                </div><!-- End of card body -->
+              </div>
+            </div><!-- End of Back -->
+          </div><!-- End of card -->
+        </div><!-- End of card wrapper -->
+      </li>
+    </ul><!-- End of carousel list -->
+    <!-- Carousel controls -->
+    <div class="carousel-controls">
+      <button class="carousel-ctrl --prev main-btn round-btn" aria-label="Previous" type="button" (click)="onCarouselRotate('prev')">
+        <fa-icon class="__icon" [icon]="['fa', 'angle-left']" aria-label="Previous"></fa-icon>
+      </button>
+      <button class="main-btn carousel-ctrl --flip" aria-label="Flip" type="button" (click)="onCarouselFlip()">Flip</button>
+      <button class="carousel-ctrl --next main-btn round-btn" aria-label="Next" type="button" (click)="onCarouselRotate('next')">
+        <fa-icon class="__icon" [icon]="['fa', 'angle-right']" aria-label="Next"></fa-icon>
+      </button>
+    </div><!-- End of carousel controls -->
+  </section><!-- End of carousel wrapper -->
+</ng-container><!-- End of presentation mode -->
+<!-- Show All -->
+<ng-template #showAll>
+  <ng-container *ngFor="let item of vocabs.controls;let i = index">
+    <!-- Card wrapper -->
+    <div class="card-wrapper --show-all" [class.--view-mode]="mode === 'view'">
+      <!-- Common card title -->
+      <span class="card__title" *ngIf="mode !== 'view'">
+        <ng-container *ngIf="item.get('frontOnTop').value;else backOnTop">Front</ng-container>
+        <ng-template #backOnTop>Back</ng-template>
+      </span>
+      <!-- Flip button -->
+      <button class="flip-btn round-btn main-btn" type="button" aria-label="flip card" (click)="flipCard(i)">
+        <fa-icon class="__icon" [icon]="['fa', 'undo']" aria-label="flip card"></fa-icon>
+      </button><!-- End of Flip button -->
+      <!-- Remove button -->
+      <button *ngIf="vocabs.controls.length > 1 && mode !== 'view'"
+              class="remove-btn round-btn sub-btn"
+              type="button"
+              aria-label="remove card"
+              (click)="onRemoveClick(i)">
+        <fa-icon class="__icon" [icon]="['fa', 'times']" aria-label="remove card"></fa-icon>
+      </button>
+      <div class="card"
+          [formGroup]="item"
+          [ngClass]="{
+            'front': item.get('frontOnTop').value,
+            'back': !item.get('frontOnTop').value
+          }">
+        <!-- Front -->
+        <div class="card__wrapper--front">
+          <div class="card--front">
+            <span class="card__title" *ngIf="mode !== 'view'">Front</span>
+            <!-- Card body -->
+            <div class="card__body">
+              <ng-container *ngIf="mode !== 'view';else viewFront">
+                <input type="text" class="ctrl vocab" formControlName="vocab">
+              </ng-container>
+              <ng-template #viewFront>
+                <span class="vocab">{{ item.get('vocab').value }}</span>
+              </ng-template>
+            </div><!-- End of card body -->
+          </div>
+        </div><!-- End of Front -->
+        <!-- Back -->
+        <div class="card__wrapper--back">
+          <div class="card--back">
+            <span class="card__title" *ngIf="mode !== 'view'">Back</span>
+            <!-- Card body -->
+            <div class="card__body">
+              <ng-container *ngIf="mode !== 'view';else viewBack">
+                <textarea cols="30" rows="10" class="desc" formControlName="desc"></textarea>
+              </ng-container>
+              <ng-template #viewBack>
+                <p class="desc">{{ item.get('desc').value }}</p>
+              </ng-template>
+            </div><!-- End of card body -->
+          </div>
+        </div><!-- End of Back -->
+      </div><!-- End of card -->
+    </div><!-- End of card wrapper -->
+  </ng-container>
+</ng-template><!-- End of show all -->

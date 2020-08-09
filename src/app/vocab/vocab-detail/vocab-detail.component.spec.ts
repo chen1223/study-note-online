@@ -1,3 +1,4 @@
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MaterialModule } from './../../share/material.module';
 import { async, ComponentFixture, TestBed, fakeAsync, tick, flush } from '@angular/core/testing';
@@ -23,6 +24,7 @@ const dummyVocabData = {
   author: {
     name: 'Bill Chen',
     username: 'billchen',
+    // tslint:disable-next-line: max-line-length
     profilePic: 'https://images.unsplash.com/photo-1522039553440-46d3e1e61e4a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=200&q=60'
   },
   vocabs: [
@@ -110,6 +112,7 @@ describe('VocabDetailComponent', () => {
         MaterialModule,
         HttpClientModule,
         HttpClientTestingModule,
+        FontAwesomeModule,
         RouterTestingModule.withRoutes([
           {
             path: 'vocab/new',
@@ -249,16 +252,16 @@ describe('VocabDetailComponent', () => {
     expect(component.getVocab).toBeDefined();
   });
   it('should call getVocabPack service when getVocab is called', fakeAsync(() => {
-    const api = spyOn(mockVocabService, 'getVocabPack').and.returnValue(of({ 'data': {} }));
+    const api = spyOn(mockVocabService, 'getVocabPack').and.returnValue(of({ data: {} }));
     const dummyId = 1;
-    mockActivatedRoute.paramMap = of({ get: () => { return dummyId; } });
+    mockActivatedRoute.paramMap = of({ get: () => dummyId });
     component.getVocab(dummyId);
     fixture.detectChanges();
     expect(api).toHaveBeenCalledWith(dummyId);
   }));
   it('should call resetForm and clear vocabs array when getVocab is called', fakeAsync(() => {
     mockActivatedRoute.data = of({ mode: 'view' });
-    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
     component.setMode();
     fixture.detectChanges();
     const fnc = spyOn(component, 'resetForm');
@@ -272,7 +275,7 @@ describe('VocabDetailComponent', () => {
   }));
   it('should set form data after getVocab is called', fakeAsync(() => {
     mockActivatedRoute.data = of({ mode: 'view' });
-    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
     component.setMode();
     const form = component.form;
     form.reset();
@@ -298,7 +301,7 @@ describe('VocabDetailComponent', () => {
    */
   it('should set mode to view mode when the url has the view keyword', fakeAsync(() => {
     mockActivatedRoute.data = of({ mode: 'view' });
-    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
     router.navigateByUrl('vocab/view/1');
     component.ngOnInit();
     fixture.detectChanges();
@@ -316,16 +319,16 @@ describe('VocabDetailComponent', () => {
     expect(fnc).toHaveBeenCalled();
   }));
   it('should store vocab id in view mode', () => {
-    expect(component.vocabId).toBeTruthy;
+    expect(component.vocabId).toBeNull();
     mockActivatedRoute.data = of({ mode: 'view' });
-    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
     router.navigateByUrl('vocab/view/1');
     component.ngOnInit();
     expect(component.vocabId).toEqual(1);
   });
   it('should disable form in view mode', () => {
     mockActivatedRoute.data = of({ mode: 'view' });
-    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
     router.navigateByUrl('vocab/view/1');
     component.ngOnInit();
     fixture.detectChanges();
@@ -333,7 +336,7 @@ describe('VocabDetailComponent', () => {
   });
   it('should not show action buttons in view mode', () => {
     mockActivatedRoute.data = of({ mode: 'view' });
-    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
     router.navigateByUrl('vocab/view/1');
     component.ngOnInit();
     fixture.detectChanges();
@@ -342,7 +345,7 @@ describe('VocabDetailComponent', () => {
   });
   it('should not show title FormControl in view mode', () => {
     mockActivatedRoute.data = of({ mode: 'view' });
-    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
     router.navigateByUrl('vocab/view/1');
     component.ngOnInit();
     fixture.detectChanges();
@@ -355,7 +358,7 @@ describe('VocabDetailComponent', () => {
    */
   it('should mode to update mode when the url has the update mode keyword', fakeAsync(() => {
     mockActivatedRoute.data = of({ mode: 'update' });
-    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
     router.navigateByUrl('vocab/update/1');
     component.ngOnInit();
     fixture.detectChanges();
@@ -367,7 +370,7 @@ describe('VocabDetailComponent', () => {
   it('should call getVocab function in update mode', fakeAsync(() => {
     const fnc = spyOn(component, 'getVocab').and.callFake(() => {});
     mockActivatedRoute.data = of({ mode: 'update' });
-    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
     router.navigateByUrl('vocab/update/1');
     component.ngOnInit();
     fixture.detectChanges();
@@ -375,9 +378,9 @@ describe('VocabDetailComponent', () => {
     expect(fnc).toHaveBeenCalled();
   }));
   it('should store vocab id in update mode', () => {
-    expect(component.vocabId).toBeTruthy;
+    expect(component.vocabId).toBeNull();
     mockActivatedRoute.data = of({ mode: 'update' });
-    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
     router.navigateByUrl('vocab/update/1');
     component.ngOnInit();
     expect(component.vocabId).toEqual(1);
@@ -444,7 +447,7 @@ describe('VocabDetailComponent', () => {
   });
   it('should fill in page title in view mode', () => {
     mockActivatedRoute.data = of({ mode: 'view' });
-    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
     router.navigateByUrl('vocab/view/1');
     component.ngOnInit();
     fixture.detectChanges();
@@ -643,7 +646,7 @@ describe('VocabDetailComponent', () => {
       vocab: 'test',
       desc: 'test desc'
     };
-    const vocabArray = component.form.get('vocabs') as FormArray
+    const vocabArray = component.form.get('vocabs') as FormArray;
     vocabArray.clear();
     component.addVocab(false, dummyVocab);
     fixture.detectChanges();
@@ -651,6 +654,64 @@ describe('VocabDetailComponent', () => {
     const firstItem = vocabArray.at(0) as FormGroup;
     expect(firstItem.get('vocab').value).toEqual(dummyVocab.vocab);
     expect(firstItem.get('desc').value).toEqual(dummyVocab.desc);
+  });
+
+  /**
+   * Presentation mode related tests
+   */
+  it('should have mode toggle button in view mode', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    fixture.detectChanges();
+    const btn = fixture.debugElement.query(By.css('.mode-btn'));
+    expect(btn).toBeTruthy();
+  });
+  it('should set aria-label on mode toggle button', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    fixture.detectChanges();
+    const btn = fixture.debugElement.query(By.css('.mode-btn'));
+    expect(btn.nativeElement.getAttribute('aria-label')).toContain('Presentation Mode');
+  });
+  it('should define current mode in a variable called presentationMode', () => {
+    expect(component.presentationMode).toBeDefined();
+    expect(component.presentationMode).toBeFalsy();
+  });
+  it('should show correct text on mode button depending on presentationMode', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    component.presentationMode = false;
+    fixture.detectChanges();
+    const oldBtn = fixture.debugElement.query(By.css('.mode-btn'));
+    expect(oldBtn.nativeElement.innerText).toEqual('Presentation Mode');
+
+    component.presentationMode = true;
+    fixture.detectChanges();
+    const newBtn = fixture.debugElement.query(By.css('.mode-btn'));
+    expect(newBtn.nativeElement.innerText).toEqual('Show All');
+  });
+  it('should have correct aria-label on mode button depending on presentationMode', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    component.presentationMode = false;
+    fixture.detectChanges();
+    const oldBtn = fixture.debugElement.query(By.css('.mode-btn'));
+    expect(oldBtn.nativeElement.getAttribute('aria-label')).toEqual('Presentation Mode');
+
+    component.presentationMode = true;
+    fixture.detectChanges();
+    const newBtn = fixture.debugElement.query(By.css('.mode-btn'));
+    expect(newBtn.nativeElement.getAttribute('aria-label')).toEqual('Show All');
+  });
+  it('should toggle presetation mode on mode button click', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    component.presentationMode = false;
+    fixture.detectChanges();
+    const modeBtn = fixture.debugElement.query(By.css('.mode-btn'));
+    modeBtn.triggerEventHandler('click', () => {});
+    fixture.detectChanges();
+    expect(component.presentationMode).toBeTruthy();
   });
 
   /**
@@ -677,7 +738,7 @@ describe('VocabDetailComponent', () => {
   });
   it('should not show new vocab button in view mode', fakeAsync(() => {
     mockActivatedRoute.data = of({ mode: 'view' });
-    mockActivatedRoute.paramMap = of({ get: () => { return 1; } });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
     component.setMode();
     tick();
     fixture.detectChanges();

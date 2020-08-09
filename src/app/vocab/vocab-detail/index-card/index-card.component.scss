@@ -37,10 +37,12 @@ $width: 100%;
 
 .card-wrapper {
   position: relative;
+  margin-bottom: 4em;
 }
 .flip-btn {
   position: absolute;
   right: 2%;
+  bottom: 2%;
   z-index: 10;
   @include flip-btn-position($width);
 }
@@ -57,12 +59,16 @@ $width: 100%;
     font-size: 1.25em;
   }
 }
+.--view-mode {
+  &.card-wrapper {
+    margin-bottom: 2em;
+  }
+}
 .card {
   transform-style: preserve-3d;
   transform: rotateY(0deg);
   position: relative;
   transition: transform .45s;
-  margin-bottom: 4em;
   &.front {
     transform: rotateY(0deg);
   }
@@ -87,7 +93,13 @@ $width: 100%;
 .card__body {
   background: $white;
   padding: 2em 0;
-  margin-top: 1em;
+}
+.--view-mode,
+.carousel-wrapper {
+  .card--front .card__body .vocab {
+    border-bottom: none;
+    text-align: center;
+  }
 }
 .card--front {
   .card__body {
@@ -126,13 +138,83 @@ $width: 100%;
     background-position-y: calc(#{$lineHeight} - 4px);
   }
 }
+/* Carousel list */
+.carousel-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  position: relative;
+  transform-style: preserve-3d;
+}
+.carousel-item {
+  position: absolute;
+  transition: transform .3s;
+  &.--prev,
+  &.--next {
+    background: #cac9c9;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.4);
+  }
+  &.--next {
+    transform: translate3d(70%, -10%, -100px) scale(.9);
+  }
+  &.--prev {
+    transform: translate3d(-70%, -10%, -100px) scale(.9);
+  }
+  &.--selected {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+.carousel-controls {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 40%;
+  margin-top: calc(1em + 150px);
+  margin-left: auto;
+  margin-right: auto;
+}
+.carousel-ctrl.--prev,
+.carousel-ctrl.--next {
+  position: absolute;
+  top: -8rem;
+  font-size: 1.2em;
+}
+.carousel-ctrl.--prev {
+  left: -8rem;
+}
+.carousel-ctrl.--next {
+  right: -8rem;
+}
+.carousel-ctrl.--flip {
+  padding: .5em 1.5em;
+}
 /* Display two cards side by side*/
 @mixin two-layout($width) {
-  .card {
-    display: flex;
-    justify-content: space-between;
-    &.back {
+  .card-wrapper.--show-all {
+    .card {
+      display: flex;
+      justify-content: space-between;
+      &.back {
+        transform: none;
+      }
+    }
+    .card__wrapper--front,
+    .card__wrapper--back {
+      @include card-width-height($width);
+      position: relative;
+      .card__title {
+        display: block;
+      }
+    }
+    .card__wrapper--front {
+      order: 1;
+    }
+    .card__wrapper--back {
       transform: none;
+      order: 2;
+    }
+    .flip-btn {
+      display: none;
     }
   }
   .card-wrapper {
@@ -140,44 +222,110 @@ $width: 100%;
       display: none;
     }
   }
-  .card__wrapper--front,
-  .card__wrapper--back {
-    @include card-width-height($width);
-    position: relative;
-    .card__title {
-      display: block;
-    }
-  }
-  .card__wrapper--front {
-    order: 1;
-  }
-  .card__wrapper--back {
-    transform: none;
-    order: 2;
-  }
-  .flip-btn {
-    display: none;
-  }
 }
 @media (min-width: 980px) {
   $width: calc(50% - 2em);
   @include two-layout($width);
-  .card {
+  .--view-mode {
+    &.card-wrapper {
+      margin-bottom: 3em;
+    }
+  }
+  .card-wrapper {
     margin-bottom: 6em;
+  }
+  // Carousel card
+  $carouselWidth: 500px;
+  .carousel-item {
+    width: $carouselWidth;
+    @include card-height($carouselWidth);
+    left: calc(50% - (#{$carouselWidth} / 2));
+  }
+  .carousel-list {
+    @include card-height($carouselWidth);
+  }
+  .carousel-controls {
+    margin-top: 3rem;
+  }
+  .carousel-item {
+    &.--next {
+      transform: translate3d(50%, -50%, -100px) scale(.7);
+    }
+    &.--prev {
+      transform: translate3d(-50%, -50%, -100px) scale(.7);
+    }
   }
 }
 @media (min-width: 767px) and (max-width: 979px) {
   $width: calc(50% - 1em);
   @include two-layout($width);
+  // Carousel card
+  $carouselWidth: 350px;
+  .carousel-item {
+    width: $carouselWidth;
+    @include card-height($carouselWidth);
+    left: calc(50% - (#{$carouselWidth} / 2));
+  }
+  .carousel-list {
+    @include card-height($carouselWidth);
+  }
+  .carousel-item {
+    &.--next {
+      transform: translate3d(60%, -40%, -100px) scale(.9);
+    }
+    &.--prev {
+      transform: translate3d(-60%, -40%, -100px) scale(.9);
+    }
+  }
+  .carousel-controls {
+    margin-top: calc(1em + 75px);
+  }
 }
 @media (max-width: 766px) {
   .card {
     @include card-height($width);
+  }
+  // Carousel card
+  $carouselWidth: 80%;
+  .carousel-item {
+    width: $carouselWidth;
+    @include card-height($carouselWidth);
+    left: calc(50% - (#{$carouselWidth} / 2));
+  }
+  .carousel-list {
+    @include card-height($carouselWidth);
+  }
+  .carousel-item {
+    &.--next {
+      transform: translate3d(40%, -40%, -100px) scale(.4);
+    }
+    &.--prev {
+      transform: translate3d(-40%, -40%, -100px) scale(.4);
+    }
+  }
+  .carousel-controls {
+    width: 60%;
+    margin-top: calc(1em + 50px);
+    text-align: center;
+  }
+  .carousel-ctrl {
+    position: static !important;
+    top: unset !important;
+    margin: 0 2rem;
   }
 }
 @media (orientation: portrait) {
 
 }
 @media (orientation: landscape) {
-
+  @media (min-width: 1300px) {
+    .carousel-item {
+      &.--next {
+        transform: translate3d(70%, -50%, -100px) scale(.9);
+      }
+      &.--prev {
+        transform: translate3d(-70%, -50%, -100px) scale(.9);
+      }
+    }
+  }
 }

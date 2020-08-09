@@ -1,9 +1,10 @@
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { MaterialModule } from './../../../share/material.module';
 import { By } from '@angular/platform-browser';
 import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core/testing';
 
 import { IndexCardComponent } from './index-card.component';
-import { Input } from '@angular/core';
+import { Input, SimpleChanges, SimpleChange } from '@angular/core';
 import { FormArray, FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
 
 describe('IndexCardComponent', () => {
@@ -15,6 +16,7 @@ describe('IndexCardComponent', () => {
       declarations: [ IndexCardComponent ],
       imports: [
         ReactiveFormsModule,
+        FontAwesomeModule,
         MaterialModule
       ]
     })
@@ -35,6 +37,9 @@ describe('IndexCardComponent', () => {
   });
   it('should have input called vocabs', () => {
     expect(component.vocabs).toBeDefined();
+  });
+  it('should have input called presentationMode', () => {
+    expect(component.presentationMode).toBeDefined();
   });
 
   /**
@@ -220,5 +225,193 @@ describe('IndexCardComponent', () => {
     fixture.detectChanges();
     const removeBtns = fixture.debugElement.queryAll(By.css('.remove-btn'));
     expect(removeBtns.length).toEqual(0);
+  });
+
+  it('should not show card title in view mode', () => {
+    component.mode = 'view';
+    fixture.detectChanges();
+    const titles = fixture.debugElement.queryAll(By.css('.card__title'));
+    expect(titles.length).toEqual(0);
+  });
+
+  /**
+   * Presentation mode related tests
+   */
+  it('should have carousel list in presentation mode', () => {
+    component.mode = 'view';
+    component.presentationMode = true;
+    fixture.detectChanges();
+    const el = fixture.debugElement.query(By.css('.carousel-list'));
+    expect(el).toBeTruthy();
+  });
+  it('should have three carousel items at all time: prev, next, selected, prep', () => {
+    component.mode = 'view';
+    component.presentationMode = true;
+    fixture.detectChanges();
+    const prevEl = fixture.debugElement.query(By.css('.carousel-item.--prev'));
+    expect(prevEl).toBeTruthy();
+    const selectedEl = fixture.debugElement.query(By.css('.carousel-item.--selected'));
+    expect(selectedEl).toBeTruthy();
+    const nextEl = fixture.debugElement.query(By.css('.carousel-item.--next'));
+    expect(nextEl).toBeTruthy();
+  });
+  it('should define selectedVocab', () => {
+    expect(component.selectedVocab).toBeDefined();
+  });
+  it('should define index of each carousel item', () => {
+    expect(component.selectedIndex).toBeDefined();
+    expect(component.prevIndex).toBeDefined();
+    expect(component.nextIndex).toBeDefined();
+  });
+  it('should define carouselItemArray', () => {
+    expect(component.carouselItemArray).toBeDefined();
+  });
+  it('should define initCarousel', () => {
+    expect(component.initCarousel).toBeDefined();
+  });
+  it('should call initCarousel when presentationMode is set to true', () => {
+    const fnc = spyOn(component, 'initCarousel').and.callFake(() => {});
+    component.ngOnChanges({
+      presentationMode: new SimpleChange(false, true, false)
+    });
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should prepare correct initial carousel list', () => {
+    component.vocabs = new FormArray([
+      new FormGroup({
+        vocab: new FormControl('vocab1'),
+        desc: new FormControl('123'),
+        frontOnTop: new FormControl(true)
+      }),
+      new FormGroup({
+        vocab: new FormControl('vocab2'),
+        desc: new FormControl('234'),
+        frontOnTop: new FormControl(true)
+      })
+    ]);
+    component.initCarousel();
+    fixture.detectChanges();
+    const vocabs = component.vocabs.getRawValue();
+    expect(component.selectedVocab).toEqual(vocabs[0]);
+  });
+  it('should have carousel controls', () => {
+    component.mode = 'view';
+    component.presentationMode = true;
+    fixture.detectChanges();
+    const prevBtn = fixture.debugElement.query(By.css('.carousel-ctrl.--prev'));
+    expect(prevBtn).toBeTruthy();
+    expect(prevBtn.nativeElement.getAttribute('aria-label')).toContain('Previous');
+    const nextBtn = fixture.debugElement.query(By.css('.carousel-ctrl.--next'));
+    expect(nextBtn).toBeTruthy();
+    expect(nextBtn.nativeElement.getAttribute('aria-label')).toContain('Next');
+    const flipBtn = fixture.debugElement.query(By.css('.carousel-ctrl.--flip'));
+    expect(flipBtn).toBeTruthy();
+    expect(flipBtn.nativeElement.getAttribute('aria-label')).toContain('Flip');
+  });
+  it('should bind onCarouselFlip to the carousel flip button', () => {
+    component.mode = 'view';
+    component.presentationMode = true;
+    fixture.detectChanges();
+    expect(component.onCarouselFlip).toBeDefined();
+    const fnc = spyOn(component, 'onCarouselFlip');
+    const flipBtn = fixture.debugElement.query(By.css('.carousel-ctrl.--flip'));
+    flipBtn.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should bind onCarouselRotate to the carousel prev button', () => {
+    component.mode = 'view';
+    component.presentationMode = true;
+    fixture.detectChanges();
+    expect(component.onCarouselRotate).toBeDefined();
+    const fnc = spyOn(component, 'onCarouselRotate');
+    const prevBtn = fixture.debugElement.query(By.css('.carousel-ctrl.--prev'));
+    prevBtn.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalledWith('prev');
+  });
+  it('should bind onCarouselRotate to the carousel next button', () => {
+    component.mode = 'view';
+    component.presentationMode = true;
+    fixture.detectChanges();
+    expect(component.onCarouselRotate).toBeDefined();
+    const fnc = spyOn(component, 'onCarouselRotate');
+    const nextBtn = fixture.debugElement.query(By.css('.carousel-ctrl.--next'));
+    nextBtn.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalledWith('next');
+  });
+  it('should flip selectedVocab when onCarouselFlip is called', () => {
+    component.mode = 'view';
+    component.presentationMode = true;
+    component.vocabs = new FormArray([
+      new FormGroup({
+        vocab: new FormControl('vocab1'),
+        desc: new FormControl('123'),
+        frontOnTop: new FormControl(true)
+      }),
+    ]);
+    component.initCarousel();
+    fixture.detectChanges();
+
+    component.onCarouselFlip();
+    expect(component.selectedVocab.frontOnTop).toBeFalsy();
+  });
+  it('should add all index by 1 when onCarouselRotate is called with next', () => {
+    component.selectedIndex = 0;
+    component.nextIndex = 1;
+    component.prevIndex = 2;
+    component.vocabs = new FormArray([
+      new FormGroup({
+        vocab: new FormControl('vocab1'),
+        desc: new FormControl('123'),
+        frontOnTop: new FormControl(true)
+      }),
+      new FormGroup({
+        vocab: new FormControl('vocab2'),
+        desc: new FormControl('123'),
+        frontOnTop: new FormControl(true)
+      }),
+      new FormGroup({
+        vocab: new FormControl('vocab3'),
+        desc: new FormControl('123'),
+        frontOnTop: new FormControl(true)
+      }),
+    ]);
+    fixture.detectChanges();
+    component.onCarouselRotate('next');
+    fixture.detectChanges();
+    expect(component.selectedIndex).toEqual(1);
+    expect(component.nextIndex).toEqual(2);
+    expect(component.prevIndex).toEqual(0);
+  });
+  it('should minus all index by 1 when onCarouselRotate is called with prev', () => {
+    component.selectedIndex = 0;
+    component.nextIndex = 1;
+    component.prevIndex = 2;
+    component.vocabs = new FormArray([
+      new FormGroup({
+        vocab: new FormControl('vocab1'),
+        desc: new FormControl('123'),
+        frontOnTop: new FormControl(true)
+      }),
+      new FormGroup({
+        vocab: new FormControl('vocab2'),
+        desc: new FormControl('123'),
+        frontOnTop: new FormControl(true)
+      }),
+      new FormGroup({
+        vocab: new FormControl('vocab3'),
+        desc: new FormControl('123'),
+        frontOnTop: new FormControl(true)
+      }),
+    ]);
+    fixture.detectChanges();
+    component.onCarouselRotate('prev');
+    fixture.detectChanges();
+    expect(component.selectedIndex).toEqual(2);
+    expect(component.nextIndex).toEqual(0);
+    expect(component.prevIndex).toEqual(1);
   });
 });
