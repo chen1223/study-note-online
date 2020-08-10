@@ -84,6 +84,7 @@ class MockVocabService {
       <div class="card--back">
         <textarea class="desc"></textarea>
       </div>
+      <li class="carousel-item --selected"></li>
     </div>
   `
 })
@@ -708,11 +709,45 @@ describe('VocabDetailComponent', () => {
     component.setMode();
     component.presentationMode = false;
     fixture.detectChanges();
+    const fnc = spyOn(component, 'toggleMode').and.callThrough();
     const modeBtn = fixture.debugElement.query(By.css('.mode-btn'));
     modeBtn.triggerEventHandler('click', () => {});
     fixture.detectChanges();
     expect(component.presentationMode).toBeTruthy();
+    expect(fnc).toHaveBeenCalled();
   });
+  it('should scollIntoView of current carousel item when mode button is clicked in presentation mode', fakeAsync(() => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    component.presentationMode = false;
+    fixture.detectChanges();
+    const modeBtn = fixture.debugElement.query(By.css('.mode-btn'));
+    modeBtn.triggerEventHandler('click', () => {});
+    fixture.detectChanges();
+    const card = document.querySelector('.carousel-item.--selected');
+    const fnc = spyOn(card as HTMLLIElement, 'scrollIntoView');
+    tick(0);
+    expect(fnc).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'center'
+    });
+  }));
+  it('should scollIntoView of first card when mode button is clicked in show all mode', fakeAsync(() => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    component.presentationMode = true;
+    fixture.detectChanges();
+    const modeBtn = fixture.debugElement.query(By.css('.mode-btn'));
+    modeBtn.triggerEventHandler('click', () => {});
+    fixture.detectChanges();
+    const card = document.querySelector('.card-wrapper:first-child');
+    const fnc = spyOn(card as HTMLLIElement, 'scrollIntoView');
+    tick(0);
+    expect(fnc).toHaveBeenCalledWith({
+      behavior: 'smooth',
+      block: 'center'
+    });
+  }));
 
   /**
    * New button related tests

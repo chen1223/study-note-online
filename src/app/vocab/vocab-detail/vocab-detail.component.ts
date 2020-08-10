@@ -1,6 +1,6 @@
 import { FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
-import { Component, OnInit } from '@angular/core';
-import { Location } from '@angular/common';
+import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
+import { Location, isPlatformBrowser } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { VocabService } from './../vocab.service';
 import * as moment from 'moment';
@@ -42,10 +42,15 @@ export class VocabDetailComponent implements OnInit {
   likeHovered = false;
   saveHovered = false;
 
+  isBrowser: boolean;
+
   constructor(public readonly location: Location,
               public readonly fb: FormBuilder,
               public vocabService: VocabService,
-              public readonly activatedRoute: ActivatedRoute) { }
+              public readonly activatedRoute: ActivatedRoute,
+              @Inject(PLATFORM_ID) platformId: Object) {
+    this.isBrowser = isPlatformBrowser(platformId);
+  }
 
   ngOnInit(): void {
     this.setMode();
@@ -166,6 +171,30 @@ export class VocabDetailComponent implements OnInit {
 
   back(): void {
     this.location.back();
+  }
+
+  // On presentation mode button click
+  toggleMode(): void {
+    this.presentationMode = !this.presentationMode;
+    if (this.isBrowser) {
+      if (this.presentationMode) {
+        setTimeout(() => {
+          const card = document.querySelector('.carousel-item.--selected') as HTMLLIElement;
+          card.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+        }, 0);
+      } else {
+        setTimeout(() => {
+          const card = document.querySelector('.card-wrapper:first-child') as HTMLLIElement;
+          card.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+        }, 0);
+      }
+    }
   }
 
   /**

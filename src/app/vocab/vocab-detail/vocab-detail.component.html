@@ -59,7 +59,7 @@
   <button
     class="main-btn mode-btn"
     type="button"
-    (click)="presentationMode = !presentationMode"
+    (click)="toggleMode()"
     [attr.aria-label]="presentationMode ? 'Show All' : 'Presentation Mode'">
     {{ presentationMode ? 'Show All' : 'Presentation Mode' }}
   </button>
