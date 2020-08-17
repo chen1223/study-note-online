@@ -3,6 +3,7 @@ import { Location } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 import { QuillEditorComponent, QuillToolbarConfig } from 'ngx-quill';
+import { NoteService } from './../note.service';
 
 @Component({
   selector: 'app-note-detail',
@@ -36,24 +37,40 @@ export class NoteDetailComponent implements OnInit, AfterViewInit {
     ]
   ];
 
+  // Current note id
+  noteId = null;
+
   // Current ink color: black, red, blue
   currentColor = 'black';
   form = this.fb.group({
-    title: ['', [Validators.required]]
+    title: ['', [Validators.required]],
+    note: [''],
+    publishedDate: [null],
+    _publishedDate: [null],
+    likes: [null],
+    saves: [null],
+    author: this.fb.group({
+      name: [null],
+      username: [null],
+      profilePic: [null]
+    })
   });
 
   @ViewChild('quillEditor') quillEditor: QuillEditorComponent;
 
   constructor(public readonly location: Location,
               public readonly activatedRoute: ActivatedRoute,
-              public readonly fb: FormBuilder) { }
+              public readonly fb: FormBuilder,
+              public readonly noteService: NoteService) { }
 
   ngOnInit(): void {
     this.setMode();
   }
 
   ngAfterViewInit(): void {
-    this.setQuillEditor();
+    if (this.mode !== 'view') {
+      this.setQuillEditor();
+    }
   }
 
   setQuillEditor(): void {
@@ -80,12 +97,43 @@ export class NoteDetailComponent implements OnInit, AfterViewInit {
           break;
         case 'view':
           this.title = 'View Note';
+          this.activatedRoute.paramMap.subscribe(params => {
+            const id = params.get('id');
+            this.noteId = id;
+            this.getData(id);
+            this.form.disable();
+          });
           break;
         case 'update':
           this.title = 'Update Note';
+          this.activatedRoute.paramMap.subscribe(params => {
+            const id = params.get('id');
+            this.noteId = id;
+            this.getData(id);
+          });
           break;
       }
     });
+  }
+
+  /**
+   * Get data from Backend API
+   */
+  getData(id): void {
+    this.noteService.getNote(id)
+        .subscribe(
+          res => {
+            console.log('get note data', res);
+            const dataKey = 'data';
+            const data = res[dataKey];
+            this.form.patchValue(data);
+          },
+          err => {
+            if (err.error) {
+              console.error(err.error);
+            }
+          }
+        );
   }
 
   back(): void {
@@ -99,6 +147,6 @@ export class NoteDetailComponent implements OnInit, AfterViewInit {
 
   // On user clicks on the save button
   onSubmit(): void {
-
+    console.log(this.form.getRawValue(), this.quillEditor);
   }
 }

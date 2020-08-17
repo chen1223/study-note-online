@@ -10,6 +10,20 @@ const routes: Routes = [
     data: {
       mode: 'create'
     }
+  },
+  {
+    path: 'view/:id',
+    component: NoteDetailComponent,
+    data: {
+      mode: 'view'
+    }
+  },
+  {
+    path: 'update/:id',
+    component: NoteDetailComponent,
+    data: {
+      mode: 'update'
+    }
   }
 ];
 

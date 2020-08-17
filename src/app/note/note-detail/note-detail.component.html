@@ -20,7 +20,8 @@
     </div><!-- End of title -->
     <!-- Note -->
     <div class="note-wrapper">
-      <quill-editor #quillEditor></quill-editor>
+      <quill-editor *ngIf="mode !== 'view'" #quillEditor formControlName="note"></quill-editor>
+      <quill-view-html *ngIf="mode === 'view'" [content]="form.get('note').value"></quill-view-html>
     </div><!-- End of note -->
   </form>
 </section><!-- End of main content -->

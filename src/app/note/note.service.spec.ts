@@ -13,4 +13,8 @@ describe('NoteService', () => {
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
+
+  it('should define function getNote', () => {
+    expect(service.getNote).toBeDefined();
+  });
 });

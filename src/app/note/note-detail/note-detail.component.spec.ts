@@ -8,8 +8,23 @@ import { ShareModule } from '../../share/share.module';
 import { of } from 'rxjs/internal/observable/of';
 import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { FormBuilder, FormControl, ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule, FormsModule, FormGroup } from '@angular/forms';
 import { QuillModule } from 'ngx-quill';
+import { NoteService } from './../note.service';
+
+const dummyNote = {
+  id: 1,
+  publishedDate: '2020/06/13',
+  likes: 103,
+  saves: 50,
+  author: {
+    name: 'Bill Chen',
+    username: 'billchen',
+    profilePic: 'https://images.unsplash.com/photo-1522039553440-46d3e1e61e4a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=200&q=60'
+  },
+  title: 'test note',
+  note: '<p>asdf <strong>zxcv</strong> <span style="color: rgb(73, 201, 221);">asdfasdfasdf</span></p>'
+};
 
 class MockActivatedRoute {
   data = of({
@@ -17,11 +32,20 @@ class MockActivatedRoute {
   });
 }
 
+class MockNoteService {
+  getNote() {
+    return of({
+      data: dummyNote
+    });
+  }
+}
+
 describe('NoteDetailComponent', () => {
   let component: NoteDetailComponent;
   let fixture: ComponentFixture<NoteDetailComponent>;
   let router: Router;
   let mockActivatedRoute;
+  let mockNoteService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -61,6 +85,10 @@ describe('NoteDetailComponent', () => {
         {
           provide: ActivatedRoute,
           useClass: MockActivatedRoute
+        },
+        {
+          provide: NoteService,
+          useClass: MockNoteService
         }
       ]
     })
@@ -72,6 +100,7 @@ describe('NoteDetailComponent', () => {
     component = fixture.componentInstance;
     router = TestBed.inject(Router);
     mockActivatedRoute = TestBed.inject(ActivatedRoute);
+    mockNoteService = TestBed.inject(NoteService);
     fixture.detectChanges();
   });
 
@@ -108,12 +137,28 @@ describe('NoteDetailComponent', () => {
     const titleEl = fixture.debugElement.query(By.css('.ctrl-wrapper.--title .ctrl'));
     expect(document.activeElement).toBe(titleEl.nativeElement);
   }));
+  it('should show quill-editor in create mode', () => {
+    mockActivatedRoute.data = of({ mode: 'create' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    const el = document.querySelector('quill-editor');
+    expect(el).toBeTruthy();
+  });
+  it('should not show quill-view-html in create mode', () => {
+    mockActivatedRoute.data = of({ mode: 'create' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    const el = document.querySelector('quill-view-html');
+    expect(el).toBeFalsy();
+  });
 
   /**
    * View mode related tests
    */
   it('should set mode to view mode when the url has the view keyword', fakeAsync(() => {
+    spyOn(component, 'getData').and.callFake(() => {});
     mockActivatedRoute.data = of({ mode: 'view' });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
     component.ngOnInit();
     fixture.detectChanges();
     // View mode test
@@ -122,12 +167,59 @@ describe('NoteDetailComponent', () => {
     fixture.detectChanges();
     expect(component.mode).toEqual('view');
   }));
+  it('should call getData function in view mode', () => {
+    const fnc = spyOn(component, 'getData').and.callFake(() => {});
+    mockActivatedRoute.data = of({ mode: 'view' });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
+    component.ngOnInit();
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should store noteId in view mode', () => {
+    expect(component.noteId).toBeNull();
+    const mockNoteId = 1;
+    mockActivatedRoute.data = of({ mode: 'view' });
+    mockActivatedRoute.paramMap = of({ get: () => mockNoteId });
+    router.navigateByUrl(`/note/view/${mockNoteId}`);
+    component.ngOnInit();
+    fixture.detectChanges();
+    expect(component.noteId).toEqual(mockNoteId);
+  });
+  it('should disable form in view mode', fakeAsync(() => {
+    spyOn(component, 'getData').and.callFake(() => {});
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    tick();
+    expect(component.form.disabled).toBeTruthy();
+  }));
+  it('should not show quill-editor in view mode', () => {
+    spyOn(component, 'getData').and.callFake(() => {});
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    const el = document.querySelector('quill-editor');
+    expect(el).toBeFalsy();
+  });
+  it('should show quill-view-html in view mode', () => {
+    spyOn(component, 'getData').and.callFake(() => {});
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    const el = document.querySelector('quill-view-html');
+    expect(el).toBeTruthy();
+  });
 
   /**
    * Update mode related test
    */
-  it('should mode to update mode when the url has the update mode keyword', fakeAsync(() => {
+  it('should set mode to update mode when the url has the upate mode keyword', fakeAsync(() => {
+    spyOn(component, 'getData').and.callFake(() => {});
     mockActivatedRoute.data = of({ mode: 'update' });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
     component.ngOnInit();
     fixture.detectChanges();
     // Update mode test
@@ -136,6 +228,42 @@ describe('NoteDetailComponent', () => {
     fixture.detectChanges();
     expect(component.mode).toEqual('update');
   }));
+  it('should call getData function in update mode', () => {
+    const fnc = spyOn(component, 'getData').and.callFake(() => {});
+    mockActivatedRoute.data = of({ mode: 'update' });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
+    component.ngOnInit();
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should store noteId in update mode', () => {
+    expect(component.noteId).toBeNull();
+    const mockNoteId = 1;
+    mockActivatedRoute.data = of({ mode: 'update' });
+    mockActivatedRoute.paramMap = of({ get: () => mockNoteId });
+    router.navigateByUrl(`note/update/${mockNoteId}`);
+    component.ngOnInit();
+    fixture.detectChanges();
+    expect(component.noteId).toEqual(mockNoteId);
+  });
+  it('should show quill-editor in update mode', () => {
+    spyOn(component, 'getData').and.callFake(() => {});
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
+    mockActivatedRoute.data = of({ mode: 'update' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    const el = document.querySelector('quill-editor');
+    expect(el).toBeTruthy();
+  });
+  it('should not show quill-view-html in update mode', () => {
+    spyOn(component, 'getData').and.callFake(() => {});
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
+    mockActivatedRoute.data = of({ mode: 'update' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    const el = document.querySelector('quill-view-html');
+    expect(el).toBeFalsy();
+  });
 
   /**
    * Back button related tests
@@ -238,6 +366,44 @@ describe('NoteDetailComponent', () => {
     fixture.detectChanges();
     expect(component.form.get('title').invalid).toBeTruthy();
   });
+  it('should define a FormControl called note', () => {
+    expect(component.form.get('note')).toBeTruthy();
+    expect(component.form.get('note')).toBeInstanceOf(FormControl);
+  });
+  it('should define a FormControl called publishedDate', () => {
+    const ctrl = component.form.get('publishedDate');
+    expect(ctrl).toBeTruthy();
+    expect(ctrl).toBeInstanceOf(FormControl);
+  });
+  it('should define a FormControl called _publishedDate', () => {
+    const ctrl = component.form.get('_publishedDate');
+    expect(ctrl).toBeTruthy();
+    expect(ctrl).toBeInstanceOf(FormControl);
+  });
+  it('should define a FormControl called likes', () => {
+    const ctrl = component.form.get('likes');
+    expect(ctrl).toBeTruthy();
+    expect(ctrl).toBeInstanceOf(FormControl);
+  });
+  it('should define a FormControl called saves', () => {
+    const ctrl = component.form.get('saves');
+    expect(ctrl).toBeTruthy();
+    expect(ctrl).toBeInstanceOf(FormControl);
+  });
+  it('should define a FormGroup called author', () => {
+    const group = component.form.get('author');
+    expect(group).toBeTruthy();
+    expect(group).toBeInstanceOf(FormGroup);
+    const nameCtrl = (group as FormGroup).get('name');
+    const usernameCtrl = (group as FormGroup).get('username');
+    const picCtrl = (group as FormGroup).get('profilePic');
+    expect(nameCtrl).toBeTruthy();
+    expect(nameCtrl).toBeInstanceOf(FormControl);
+    expect(usernameCtrl).toBeTruthy();
+    expect(usernameCtrl).toBeInstanceOf(FormControl);
+    expect(picCtrl).toBeTruthy();
+    expect(picCtrl).toBeInstanceOf(FormControl);
+  });
   it('should bind onSubmit function to form', () => {
     // should define onSubmit
     expect(component.onSubmit).toBeDefined();
@@ -253,12 +419,61 @@ describe('NoteDetailComponent', () => {
   it('should define toolbarConfig', () => {
     expect(component.toolbarConfig).toBeTruthy();
   });
-  it('should set QuillEditor toolbar after view init', () => {
+  it('should not call QuillEditor toolbar after view init in view mode', () => {
     expect(component.setQuillEditor).toBeTruthy();
+    spyOn(component, 'getData').and.callFake(() => {});
+    mockActivatedRoute.data = of({ mode: 'view' });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
+    component.ngOnInit();
+    const fnc = spyOn(component, 'setQuillEditor');
+    component.ngAfterViewInit();
+    fixture.detectChanges();
+    expect(fnc).not.toHaveBeenCalled();
+  });
+
+  it('should set QuillEditor toolbar after view init in update mode', () => {
+    expect(component.setQuillEditor).toBeTruthy();
+    spyOn(component, 'getData').and.callFake(() => {});
+    mockActivatedRoute.data = of({ mode: 'update' });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
+    component.ngOnInit();
     const fnc = spyOn(component, 'setQuillEditor');
     component.ngAfterViewInit();
     fixture.detectChanges();
     expect(fnc).toHaveBeenCalled();
     expect(component.quillEditor.modules.toolbar).toBe(component.toolbarConfig);
   });
+  it('should set QuillEditor toolbar after view init in create mode', () => {
+    expect(component.setQuillEditor).toBeTruthy();
+    spyOn(component, 'getData').and.callFake(() => {});
+    mockActivatedRoute.data = of({ mode: 'create' });
+    component.ngOnInit();
+    const fnc = spyOn(component, 'setQuillEditor');
+    component.ngAfterViewInit();
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalled();
+    expect(component.quillEditor.modules.toolbar).toBe(component.toolbarConfig);
+  });
+
+  /**
+   * getData function related tests
+   */
+  it('should have a function called getData', () => {
+    expect(component.getData).toBeDefined();
+  });
+  it('should invoke getNote of NoteService on getData called', () => {
+    expect(component.noteService).toBeDefined();
+    const fnc = spyOn(mockNoteService, 'getNote').and.callThrough();
+    component.getData(1);
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should update form after getNote is called', fakeAsync(() => {
+    component.form.reset();
+    fixture.detectChanges();
+    component.getData(1);
+    tick();
+    fixture.detectChanges();
+    expect(component.form.get('title').value).toEqual(dummyNote.title);
+    expect(component.form.get('note').value).toEqual(dummyNote.note);
+  }));
 });
