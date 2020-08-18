@@ -89,7 +89,7 @@ describe('HeaderComponent', () => {
   });
   it('should show dialog on openLoginDialog called', () => {
     const fnc = spyOn(component.matDialog, 'open').and.returnValue(dialogRefSpyObj);
-    component.openLoginDialog();
+    component.openLoginDialog(new Event('click'));
     fixture.detectChanges();
     expect(fnc).toHaveBeenCalled();
   });

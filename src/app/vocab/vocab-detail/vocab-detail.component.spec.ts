@@ -353,6 +353,22 @@ describe('VocabDetailComponent', () => {
     const ctrl = fixture.debugElement.query(By.css('.title-ctrl'));
     expect(ctrl).toBeFalsy();
   });
+  it('should only show mode button in view mode', () => {
+    component.mode = 'view';
+    fixture.detectChanges();
+    const elInViewMode = fixture.debugElement.query(By.css('.mode-row'));
+    expect(elInViewMode).toBeTruthy();
+
+    component.mode = 'update';
+    fixture.detectChanges();
+    const elInUpdateMode = fixture.debugElement.query(By.css('.mode-row'));
+    expect(elInUpdateMode).toBeFalsy();
+
+    component.mode = 'create';
+    fixture.detectChanges();
+    const elInCreateMode = fixture.debugElement.query(By.css('.mode-row'));
+    expect(elInCreateMode).toBeFalsy();
+  });
 
   /**
    * Update mode related test
@@ -467,7 +483,7 @@ describe('VocabDetailComponent', () => {
   /**
    * Detail section related tests
    */
-  it('should have detail section in view and update mode', () => {
+  it('should only show detail section in view mode', () => {
     mockActivatedRoute.data = of({ mode: 'view' });
     component.setMode();
     fixture.detectChanges();
@@ -478,7 +494,7 @@ describe('VocabDetailComponent', () => {
     component.setMode();
     fixture.detectChanges();
     const detailInUpdate = fixture.debugElement.query(By.css('.detail-section'));
-    expect(detailInUpdate).toBeTruthy();
+    expect(detailInUpdate).toBeFalsy();
 
     mockActivatedRoute.data = of({ mode: 'create' });
     component.setMode();

@@ -4,6 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { FormBuilder, Validators } from '@angular/forms';
 import { QuillEditorComponent, QuillToolbarConfig } from 'ngx-quill';
 import { NoteService } from './../note.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-note-detail',
@@ -39,6 +40,9 @@ export class NoteDetailComponent implements OnInit, AfterViewInit {
 
   // Current note id
   noteId = null;
+
+  likeHovered = false;
+  saveHovered = false;
 
   // Current ink color: black, red, blue
   currentColor = 'black';
@@ -92,7 +96,9 @@ export class NoteDetailComponent implements OnInit, AfterViewInit {
           // Set focus to the title input
           setTimeout(() => {
             const titleEl = document.querySelector('.--title .ctrl') as HTMLInputElement;
-            titleEl.focus();
+            if (titleEl) {
+              titleEl.focus();
+            }
           }, 0);
           break;
         case 'view':
@@ -126,7 +132,9 @@ export class NoteDetailComponent implements OnInit, AfterViewInit {
             console.log('get note data', res);
             const dataKey = 'data';
             const data = res[dataKey];
+            data['_publishedDate'] = moment(new Date(data['publishedDate'])).format('MMM DD, YYYY');
             this.form.patchValue(data);
+            this.title = data.title;
           },
           err => {
             if (err.error) {
@@ -138,6 +146,20 @@ export class NoteDetailComponent implements OnInit, AfterViewInit {
 
   back(): void {
     this.location.back();
+  }
+
+  /**
+   * On like button click
+   */
+  onLike(): void {
+    console.log('on like');
+  }
+
+  /**
+   * On save button click
+   */
+  onSave(): void {
+    console.log('on save');
   }
 
   // On user clicks on the cancel button

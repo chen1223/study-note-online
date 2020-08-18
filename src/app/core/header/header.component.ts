@@ -18,19 +18,31 @@ export class HeaderComponent implements OnInit {
 
   toggleMenu() {
     this.isActive = !this.isActive;
+    const body = document.querySelector('body') as HTMLBodyElement;
+    if (this.isActive) {
+      // Lock page from scrolling when menu is opened
+      body.classList.add('--menu-opened');
+    } else {
+      body.classList.remove('--menu-opened');
+    }
   }
 
   // Force close the menu
   closeMenu(): void {
     this.isActive = false;
+    const body = document.querySelector('body') as HTMLBodyElement;
+    body.classList.remove('--menu-opened');
   }
 
   // On user clicks on login / signup
-  openLoginDialog(): void {
+  openLoginDialog(event): void {
+    event.stopPropagation();
     const dialogRef = this.matDialog.open(LoginDialogComponent, {
       panelClass: 'login-panel',
       width: '500px'
     });
-    dialogRef.afterClosed().subscribe(result => {});
+    dialogRef.afterClosed().subscribe(result => {
+      this.closeMenu();
+    });
   }
 }

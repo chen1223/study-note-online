@@ -3,8 +3,9 @@ import { async, ComponentFixture, TestBed, fakeAsync, tick } from '@angular/core
 
 import { FloatBtnComponent } from './float-btn.component';
 import { RouterTestingModule } from '@angular/router/testing';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { Component } from '@angular/core';
+import { of } from 'rxjs/internal/observable/of';
 
 @Component({
   selector: 'app-home',
@@ -40,7 +41,7 @@ describe('FloatBtnComponent', () => {
           path: 'vocab/new',
           component: MockNewVocabComponent
         }
-      ])]
+      ])],
     })
     .compileComponents();
   }));
@@ -69,29 +70,21 @@ describe('FloatBtnComponent', () => {
     expect(component.isOpen).toBeFalsy();
   });
 
-  it('should not show float button in path that include "new"', fakeAsync(() => {
-    expect(component.router).toBeDefined();
-    expect(component.canShow).toBeDefined();
-    router.navigateByUrl('');
-    tick();
-    expect(component.canShow()).toBeTruthy();
-    router.navigateByUrl('/vocab/new');
-    tick();
-    expect(component.canShow()).toBeFalsy();
-  }));
+  it('should define isHome', () => {
+    expect(component.isHome).toBeDefined();
+  });
 
-  it('should bind the canShow function to action-box', fakeAsync(() => {
-    router.navigateByUrl('');
-    tick();
+  it('should only show float button on home page', () => {
+    component.isHome = true;
     fixture.detectChanges();
     const el = fixture.debugElement.query(By.css('.action-box'));
     expect(el).toBeTruthy();
-    router.navigateByUrl('/vocab/new');
-    tick();
+
+    component.isHome = false;
     fixture.detectChanges();
     const updatedEl = fixture.debugElement.query(By.css('.action-box'));
     expect(updatedEl).toBeFalsy();
-  }));
+  });
 
   it('should close the float button on link click', () => {
     component.isOpen = true;

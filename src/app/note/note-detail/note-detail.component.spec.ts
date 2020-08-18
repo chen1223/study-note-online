@@ -11,6 +11,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { FormBuilder, FormControl, ReactiveFormsModule, FormsModule, FormGroup } from '@angular/forms';
 import { QuillModule } from 'ngx-quill';
 import { NoteService } from './../note.service';
+import * as moment from 'moment';
 
 const dummyNote = {
   id: 1,
@@ -30,6 +31,7 @@ class MockActivatedRoute {
   data = of({
     mode: 'create'
   });
+  paramMap = of({ get: () => 1 });
 }
 
 class MockNoteService {
@@ -101,6 +103,8 @@ describe('NoteDetailComponent', () => {
     router = TestBed.inject(Router);
     mockActivatedRoute = TestBed.inject(ActivatedRoute);
     mockNoteService = TestBed.inject(NoteService);
+    // Set default mode to view mode
+    component.mode = 'create';
     fixture.detectChanges();
   });
 
@@ -145,11 +149,17 @@ describe('NoteDetailComponent', () => {
     expect(el).toBeTruthy();
   });
   it('should not show quill-view-html in create mode', () => {
-    mockActivatedRoute.data = of({ mode: 'create' });
-    component.ngOnInit();
+    component.mode = 'create';
     fixture.detectChanges();
     const el = document.querySelector('quill-view-html');
     expect(el).toBeFalsy();
+  });
+  it('should not show page title in update mode', () => {
+    mockActivatedRoute.data = of({ mode: 'create' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    const el = fixture.debugElement.query(By.css('.page-title'));
+    expect(el).toBeTruthy();
   });
 
   /**
@@ -212,6 +222,33 @@ describe('NoteDetailComponent', () => {
     const el = document.querySelector('quill-view-html');
     expect(el).toBeTruthy();
   });
+  it('should bind --view-mode class to action-row in view mode', () => {
+    component.mode = 'view';
+    fixture.detectChanges();
+    const el = fixture.debugElement.query(By.css('.action-row'));
+    expect(el.nativeElement.classList).toContain('--view-mode');
+  });
+  it('should show page title in view mode', () => {
+    component.mode = 'view';
+    fixture.detectChanges();
+    const el = fixture.debugElement.query(By.css('.page-title'));
+    expect(el).toBeTruthy();
+  });
+  it('should not show action-btns in view mode', () => {
+    component.mode = 'view';
+    fixture.detectChanges();
+    const el = fixture.debugElement.query(By.css('.action-btns'));
+    expect(el).toBeFalsy();
+  });
+  it('should not show title control in view mode', () => {
+    spyOn(component, 'getData').and.callFake(() => {});
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    const el = fixture.debugElement.query(By.css('.ctrl-title'));
+    expect(el).toBeFalsy();
+  });
 
   /**
    * Update mode related test
@@ -264,7 +301,24 @@ describe('NoteDetailComponent', () => {
     const el = document.querySelector('quill-view-html');
     expect(el).toBeFalsy();
   });
-
+  it('should not have --view-mode class to action-row in update mode', () => {
+    spyOn(component, 'getData').and.callFake(() => {});
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
+    mockActivatedRoute.data = of({ mode: 'update' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    const el = fixture.debugElement.query(By.css('.action-row'));
+    expect(el.nativeElement.classList).not.toContain('--view-mode');
+  });
+  it('should not show page title in update mode', () => {
+    spyOn(component, 'getData').and.callFake(() => {});
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
+    mockActivatedRoute.data = of({ mode: 'update' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    const el = fixture.debugElement.query(By.css('.page-title'));
+    expect(el).toBeFalsy();
+  });
   /**
    * Back button related tests
    */
@@ -286,6 +340,13 @@ describe('NoteDetailComponent', () => {
     backLink.triggerEventHandler('click', null);
     fixture.detectChanges();
     expect(fnc).toHaveBeenCalled();
+  });
+  it('should not have --view-mode class to action-row in update mode', () => {
+    mockActivatedRoute.data = of({ mode: 'create' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    const el = fixture.debugElement.query(By.css('.action-row'));
+    expect(el.nativeElement.classList).not.toContain('--view-mode');
   });
 
   /**
@@ -324,26 +385,16 @@ describe('NoteDetailComponent', () => {
     expect(titleEl.nativeElement.innerText).toEqual('New Note');
     expect(component.title).toEqual('New Note');
   });
-  it('should have page title: View Note in view mode', () => {
+  it('should set page title according to data', fakeAsync(() => {
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
     mockActivatedRoute.data = of({ mode: 'view' });
     component.ngOnInit();
+    tick();
     fixture.detectChanges();
     const titleEl = fixture.debugElement.query(By.css('.page-title'));
-    expect(component.title).toBeDefined();
     expect(titleEl).toBeTruthy();
-    expect(titleEl.nativeElement.innerText).toEqual('View Note');
-    expect(component.title).toEqual('View Note');
-  });
-  it('should have page title: Update Note in update mode', () => {
-    mockActivatedRoute.data = of({ mode: 'update' });
-    component.ngOnInit();
-    fixture.detectChanges();
-    const titleEl = fixture.debugElement.query(By.css('.page-title'));
-    expect(component.title).toBeDefined();
-    expect(titleEl).toBeTruthy();
-    expect(titleEl.nativeElement.innerText).toEqual('Update Note');
-    expect(component.title).toEqual('Update Note');
-  });
+    expect(titleEl.nativeElement.innerText).toEqual(dummyNote.title);
+  }));
 
   /**
    * Form related tests
@@ -468,12 +519,89 @@ describe('NoteDetailComponent', () => {
     expect(fnc).toHaveBeenCalled();
   });
   it('should update form after getNote is called', fakeAsync(() => {
+    component.mode = 'update';
     component.form.reset();
     fixture.detectChanges();
     component.getData(1);
     tick();
     fixture.detectChanges();
+    const form = component.form;
     expect(component.form.get('title').value).toEqual(dummyNote.title);
     expect(component.form.get('note').value).toEqual(dummyNote.note);
+    expect(form.get('publishedDate').value).toEqual(dummyNote.publishedDate);
+    const formattedDate = moment(new Date(dummyNote.publishedDate)).format('MMM DD, YYYY');
+    expect(form.get('_publishedDate').value).toEqual(formattedDate);
+    expect(form.get('likes').value).toEqual(dummyNote.likes);
+    expect(form.get('saves').value).toEqual(dummyNote.saves);
+    expect((form.get('author') as FormGroup).get('name').value).toEqual(dummyNote.author.name);
+    expect((form.get('author') as FormGroup).get('username').value).toEqual(dummyNote.author.username);
+    expect((form.get('author') as FormGroup).get('profilePic').value).toEqual(dummyNote.author.profilePic);
   }));
+
+  /**
+   * Detail section related tests
+   */
+  it('should only show detail section in view mode', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    component.setMode();
+    fixture.detectChanges();
+    const detailSecInView = fixture.debugElement.query(By.css('.detail-section'));
+    expect(detailSecInView).toBeTruthy();
+
+    mockActivatedRoute.data = of({ mode: 'update' });
+    component.setMode();
+    fixture.detectChanges();
+    const detailInUpdate = fixture.debugElement.query(By.css('.detail-section'));
+    expect(detailInUpdate).toBeFalsy();
+
+    mockActivatedRoute.data = of({ mode: 'create' });
+    component.setMode();
+    fixture.detectChanges();
+    const detailInCreate = fixture.debugElement.query(By.css('.detail-section'));
+    expect(detailInCreate).toBeFalsy();
+  });
+  it('should have author profile link in view mode', () => {
+    component.mode = 'view';
+    fixture.detectChanges();
+    const link = fixture.debugElement.query(By.css('.author-link'));
+    expect(link).toBeTruthy();
+    const icon = fixture.debugElement.query(By.css('.author-link .avatar'));
+    expect(icon).toBeTruthy();
+    const name = fixture.debugElement.query(By.css('.author-link .name'));
+    expect(name).toBeTruthy();
+  });
+  it('should have like button in view mode', () => {
+    component.mode = 'view';
+    fixture.detectChanges();
+    const likeBtn = fixture.debugElement.query(By.css('.--like-btn'));
+    expect(likeBtn).toBeTruthy();
+  });
+  it('should have social save button in view mode', () => {
+    component.mode = 'view';
+    fixture.detectChanges();
+    const saveBtn = fixture.debugElement.query(By.css('.--save-btn'));
+    expect(saveBtn).toBeTruthy();
+  });
+  it('should have date in view mode', () => {
+    component.mode = 'view';
+    fixture.detectChanges();
+    const date = fixture.debugElement.query(By.css('.date'));
+    expect(date).toBeTruthy();
+  });
+  it('should call onLike function when like button is clicked', () => {
+    component.mode = 'view';
+    fixture.detectChanges();
+    const fnc = spyOn(component, 'onLike').and.callFake(() => {});
+    const btn = fixture.debugElement.query(By.css('.--like-btn'));
+    btn.triggerEventHandler('click', null);
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should call onSave function when save button is clicked', () => {
+    component.mode = 'view';
+    fixture.detectChanges();
+    const fnc = spyOn(component, 'onSave').and.callFake(() => {});
+    const btn = fixture.debugElement.query(By.css('.--save-btn'));
+    btn.triggerEventHandler('click', null);
+    expect(fnc).toHaveBeenCalled();
+  });
 });

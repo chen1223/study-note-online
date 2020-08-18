@@ -61,3 +61,8 @@ $lineHeight: 2.5em;
     }
   }
 }
+@media (max-width: 480px) {
+  .note-wrapper {
+    margin-top: 2rem;
+  }
+}

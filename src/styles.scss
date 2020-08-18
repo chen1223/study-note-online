@@ -12,6 +12,9 @@ body {
   margin: 0;
   position: relative;
   background: $bgColor;
+  &.--menu-opened {
+    overflow-y: hidden;
+  }
 }
 /** Page wrapper **/
 .page-wrapper {
@@ -65,6 +68,14 @@ button {
   font-size: 1.2em;
 }
 /* Page title */
+.action-row.--view-mode {
+  display: flex;
+  justify-content: space-between;
+  .page-title {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
 .page-title {
   color: $black;
   font-size: 1.6em;
@@ -80,6 +91,67 @@ button {
     font-size: 1em;
   }
 }
+/** Detail section **/
+.detail-section {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4rem;
+}
+.author-link {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  .avatar {
+    width: 30px;
+    max-width: 30px;
+    height: auto;
+    border-radius: 50%;
+    margin-right: .5em;
+  }
+  .name {
+    color: $black;
+    font-size: .9em;
+    font-weight: 600;
+  }
+}
+.meta-btn {
+  color: $black;
+  background: none;
+  border: none;
+  outline: none;
+  margin-left: 1rem;
+  cursor: pointer;
+  &.hover {
+    .__icon.--normal {
+      display: none;
+    }
+    .__icon.--hover {
+      display: inline;
+    }
+    .count-title, .count {
+      color: $red;
+    }
+  }
+  .__icon {
+    font-size: 1.1rem;
+    margin-right: .5rem;
+    &.--hover {
+      display: none;
+      color: $red;
+    }
+  }
+  .count-title {
+    font-size: .9rem;
+  }
+  .count {
+    font-size: .8rem;
+  }
+}
+.date {
+  color: $black;
+  margin-left: 1rem;
+  font-size: .9rem;
+}
 @media (min-width: 1400px) {
   body {
     font-size: 16px;
@@ -91,8 +163,6 @@ button {
     padding: 0;
   }
   .action-row {
-    display: flex;
-    justify-content: space-between;
     .action-btns {
       margin: auto 0;
       margin-left: auto;
@@ -138,6 +208,43 @@ button {
 @media (min-width: 320px) and (max-width: 766px) {
   body {
     font-size: 14px;
+  }
+}
+@media (max-width: 480px) {
+  .page-wrapper {
+    padding: 1.5rem 1rem;
+  }
+  .detail-section {
+    display: block;
+    margin-bottom: 2rem;
+    .metadata {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+      .meta-btn,
+      .date {
+        margin: auto 0;
+      }
+    }
+  }
+}
+/* XS devices */
+@media (max-width: 330px) {
+  /* Move date span of meata data section to the second line */
+  .detail-section .metadata {
+    flex-wrap: wrap;
+    .--like-btn, .--save-btn {
+      width: calc(50% - 2rem);
+      margin-bottom: 1.5rem;
+    }
+    .--save-btn {
+      text-align: right;
+      padding-right: 0;
+      margin-left: auto;
+    }
+    .date {
+      margin-left: auto;
+    }
   }
 }
 @media (orientation: landscape) {

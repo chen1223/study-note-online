@@ -5,6 +5,9 @@ import { Routes, RouterModule } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
+    data: {
+      isHome: true
+    },
     loadChildren: () => import('./core/core.module').then(m => m.CoreModule)
   },
   {

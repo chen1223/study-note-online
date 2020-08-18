@@ -14,7 +14,7 @@
   </div>
 </div><!-- End of action row -->
 <!-- Detail section -->
-<section class="detail-section" *ngIf="mode !== 'create'">
+<section class="detail-section" *ngIf="mode === 'view'">
   <!-- Author -->
   <a class="author-link" [routerLink]="form.get('author').value ? '/profile/' + form.get('author')?.get('username')?.value : ''">
     <img [src]="form.get('author')?.get('profilePic')?.value" [alt]="form.get('author')?.get('name')?.value" class="avatar">
@@ -55,7 +55,7 @@
   </div><!-- End of metadata -->
 </section><!-- End of detail section -->
 <!-- Mode row -->
-<section class="mode-row">
+<section class="mode-row" *ngIf="mode === 'view'">
   <button
     class="main-btn mode-btn"
     type="button"

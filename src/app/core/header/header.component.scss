@@ -49,12 +49,12 @@
 .hamburger-inner::before,
 .hamburger-inner::after {
   width: 30px;
-  background-color: $white;
+  background-color: white;
 }
 .hamburger.is-active .hamburger-inner,
 .hamburger.is-active .hamburger-inner::before,
 .hamburger.is-active .hamburger-inner::after {
-  background-color: $white;
+  background-color: white;
 }
 .opened {
   .menu-backdrop {
@@ -73,11 +73,11 @@
 }
 .menu-wrapper {
   overflow-x: hidden;
-  width: 55%;
-  height: 25em;
+  width: 80%;
+  height: calc(100vh - #{$headerHeight});
   position: absolute;
   right: 0;
-  top: $headerHeight;
+  top: calc(#{$headerHeight} - 1px);
 }
 .menu {
   padding: 0;
