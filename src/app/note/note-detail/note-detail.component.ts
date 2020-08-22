@@ -48,7 +48,7 @@ export class NoteDetailComponent implements OnInit, AfterViewInit {
   currentColor = 'black';
   form = this.fb.group({
     title: ['', [Validators.required]],
-    note: [''],
+    note: ['', [Validators.required]],
     publishedDate: [null],
     _publishedDate: [null],
     likes: [null],
@@ -156,7 +156,7 @@ export class NoteDetailComponent implements OnInit, AfterViewInit {
   }
 
   /**
-   * On save button click
+   * On save button click (Save this note to personal profile)
    */
   onSave(): void {
     console.log('on save');
@@ -167,8 +167,26 @@ export class NoteDetailComponent implements OnInit, AfterViewInit {
 
   }
 
-  // On user clicks on the save button
+  // Verify if the form is valid
+  isFormValid(): boolean {
+    return this.form.get('title').valid && this.form.get('note').valid;
+  }
+
+  // On user clicks on the save button (Save changes of this note)
   onSubmit(): void {
     console.log(this.form.getRawValue(), this.quillEditor);
+    if (!this.isFormValid()) {
+      return;
+    }
+    const body = this.form.getRawValue();
+    const apiCall = this.mode === 'create' ? this.noteService.postNote(body) : this.noteService.patchNote(body);
+    apiCall.subscribe(
+      res => {},
+      err => {
+        if (err.error) {
+          console.log(err.error);
+        }
+      }
+    );
   }
 }

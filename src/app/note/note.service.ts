@@ -35,4 +35,28 @@ export class NoteService {
       }, 50);
     });
   }
+
+  /**
+   * Create note
+   */
+  postNote(body): Observable<object> {
+    return new Observable(observer => {
+      setTimeout(() => {
+        observer.next({});
+        observer.complete();
+      }, 50);
+    });
+  }
+
+  /**
+   * Update note
+   */
+  patchNote(body): Observable<object> {
+    return new Observable(observer => {
+      setTimeout(() => {
+        observer.next({});
+        observer.complete();
+      }, 50);
+    });
+  }
 }

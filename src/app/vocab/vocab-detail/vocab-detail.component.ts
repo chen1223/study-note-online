@@ -163,7 +163,7 @@ export class VocabDetailComponent implements OnInit {
   }
 
   /**
-   * On save button click
+   * On save button click (Save this vocab to personal profile)
    */
   onSave(): void {
     console.log('on save');
@@ -246,7 +246,7 @@ export class VocabDetailComponent implements OnInit {
   }
 
   /**
-   * On form submit
+   * On form submit (Save changes of this vocab)
    */
   onSubmit(): void {
     const valid = this.isFormValid();

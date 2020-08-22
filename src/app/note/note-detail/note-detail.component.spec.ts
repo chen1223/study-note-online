@@ -40,6 +40,12 @@ class MockNoteService {
       data: dummyNote
     });
   }
+  postNote(body) {
+    return of({});
+  }
+  patchNote(body) {
+    return of({});
+  }
 }
 
 describe('NoteDetailComponent', () => {
@@ -371,6 +377,38 @@ describe('NoteDetailComponent', () => {
     btnEl.triggerEventHandler('click', null);
     expect(fnc).toHaveBeenCalled();
   });
+  it('should call isFormValid when onSubmit function is called', () => {
+    const fnc = spyOn(component, 'isFormValid');
+    component.onSubmit();
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should get formRawValue when onSubmit is called', () => {
+    spyOn(component, 'isFormValid').and.returnValue(true);
+    const fnc = spyOn(component.form, 'getRawValue');
+    component.onSubmit();
+    fixture.detectChanges();
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should call postNote in create mode when onSubmit is called', () => {
+    mockActivatedRoute.data = of({ mode: 'create' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    spyOn(component, 'isFormValid').and.returnValue(true);
+    const fnc = spyOn(mockNoteService, 'postNote').and.returnValue(of({}));
+    component.onSubmit();
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should call patchNote in update mode when onSubmit is called', () => {
+    spyOn(component, 'getData').and.callFake(() => {});
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
+    mockActivatedRoute.data = of({ mode: 'update' });
+    component.ngOnInit();
+    fixture.detectChanges();
+    spyOn(component, 'isFormValid').and.returnValue(true);
+    const fnc = spyOn(mockNoteService, 'patchNote').and.returnValue(of({}));
+    component.onSubmit();
+    expect(fnc).toHaveBeenCalled();
+  });
 
   /**
    * Page title related tests
@@ -417,9 +455,14 @@ describe('NoteDetailComponent', () => {
     fixture.detectChanges();
     expect(component.form.get('title').invalid).toBeTruthy();
   });
-  it('should define a FormControl called note', () => {
+  it('should define a FormControl called note with required validation', () => {
     expect(component.form.get('note')).toBeTruthy();
     expect(component.form.get('note')).toBeInstanceOf(FormControl);
+
+    // Validation test
+    component.form.get('note').setValue(null);
+    fixture.detectChanges();
+    expect(component.form.get('note').invalid).toBeTruthy();
   });
   it('should define a FormControl called publishedDate', () => {
     const ctrl = component.form.get('publishedDate');
@@ -462,6 +505,30 @@ describe('NoteDetailComponent', () => {
     const fnc = spyOn(component, 'onSubmit').and.callFake(() => {});
     form.triggerEventHandler('submit', null);
     expect(fnc).toHaveBeenCalled();
+  });
+  it('should define isFormValid', () => {
+    expect(component.isFormValid);
+  });
+  it('should return false when title is empty', () => {
+    const form = component.form;
+    form.get('note').setValue('123');
+    form.get('title').setValue(null);
+    fixture.detectChanges();
+    expect(component.isFormValid()).toBeFalsy();
+  });
+  it('should return false when note is empty', () => {
+    const form = component.form;
+    form.get('title').setValue('123');
+    form.get('note').setValue(null);
+    fixture.detectChanges();
+    expect(component.isFormValid()).toBeFalsy();
+  });
+  it('should return true when both title and note are valid', () => {
+    const form = component.form;
+    form.get('title').setValue('123');
+    form.get('note').setValue('123');
+    fixture.detectChanges();
+    expect(component.isFormValid()).toBeTruthy();
   });
 
   /**

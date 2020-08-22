@@ -34,6 +34,9 @@
     margin-right: .5em;
     font-size: 1.5em;
   }
+  &.__title {
+    white-space: nowrap;
+  }
 }
 /** Hamburger Styling **/
 .hamburger {
@@ -94,7 +97,7 @@
   flex-direction: column;
   padding: 3em;
   box-shadow: inset 0px -2px 3px -1px rgba(0, 0, 0, 0.2);
-  transform: translateX(100%);
+  transform: translateX(110%);
   transition: transform .45s ease-in-out;
   background: $gradientBg;
   .item {
