@@ -20,7 +20,7 @@ body {
 .page-wrapper {
   min-height: calc(100% - #{$headerHeight});
   padding: 2em;
-  max-width: 1600px;
+  max-width: 1300px;
   margin: auto;
   position: relative;
   margin-bottom: 6rem;
@@ -65,7 +65,7 @@ button {
   text-decoration: none;
   cursor: pointer;
   color: $black;
-  font-size: 1.2em;
+  font-size: 1.2rem;
 }
 /* Page title */
 .action-row.--view-mode {
@@ -78,7 +78,7 @@ button {
 }
 .page-title {
   color: $black;
-  font-size: 1.6em;
+  font-size: 1.6rem;
   font-weight: 600;
   margin: 1.5em 0;
 }
@@ -86,9 +86,9 @@ button {
 .action-btns {
   text-align: right;
   button {
-    margin-left: 1em;
+    margin-left: 1rem;
     width: 6em;
-    font-size: 1em;
+    font-size: 1rem;
   }
 }
 /** Detail section **/
@@ -110,7 +110,7 @@ button {
   }
   .name {
     color: $black;
-    font-size: .9em;
+    font-size: .9rem;
     font-weight: 600;
   }
 }

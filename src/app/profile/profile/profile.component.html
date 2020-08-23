@@ -1,1 +1,73 @@
-<p>profile works!</p>
+<a class="back-link" (click)="back()">
+  <fa-icon class="brand __icon" [icon]="['fa', 'angle-left']" aria-label="Back"></fa-icon>
+  Back
+</a>
+<!-- Basic info section -->
+<section class="basic-info">
+  <!-- Profile wrapper -->
+  <div class="profile-wrapper">
+    <!-- Profile image -->
+    <div class="profile-img-wrapper">
+      <img [src]="profileData?.profilePic" [alt]="profileData?.name" class="profile-img">
+    </div><!-- End of profile image -->
+    <!-- Stats wrapper -->
+    <div class="stats-wrapper">
+      <h1 class="profile__name">{{ profileData?.name }}</h1>
+      <div class="follow-wrapper">
+        <!-- Followers -->
+        <div class="follow-inner-wrapper">
+          <span class="follow__title --follower">Followers:</span>
+          <span class="follow__detail --follower">{{ profileData?.followers | number: '2.' }}</span>
+        </div><!-- End of followers -->
+        <!-- Following -->
+        <div class="follow-inner-wrapper">
+          <span class="follow__title --following">Following:</span>
+          <span class="follow__detail --following">{{ profileData?.followings | number: '2.' }}</span>
+        </div><!-- End of following -->
+      </div>
+    </div><!-- End of stats wrapper -->
+  </div><!-- End of profile wrapper -->
+  <!-- Follow wrapper -->
+  <div class="follow-action-wrapper">
+    <button class="main-btn follow-btn" aria-label="Follow">Follow</button>
+  </div><!-- End of follow wrapper -->
+</section><!-- Basic info section -->
+<!-- Vocab section -->
+<section class="vocab-section" *ngIf="profileData?.totalVocabs > 0">
+  <!-- Section header -->
+  <div class="section-header">
+    <div class="inner-header-wrapper">
+      <h2 class="section-title --vocab">Vocabularies</h2>
+      <span class="counter --vocab">{{ profileData?.totalVocabs }} packs</span>
+    </div>
+    <a routerLink="./vocabs" class="see-all --vocab">See All</a>
+  </div><!-- End of section header -->
+  <!-- Section body -->
+  <div class="section-body"></div><!-- End of section body -->
+</section><!-- End of vocab section -->
+<!-- Note section -->
+<section class="note-section" *ngIf="profileData?.totalNotes > 0">
+  <!-- Section header -->
+  <div class="section-header">
+    <div class="inner-header-wrapper">
+      <h2 class="section-title --note">Notes</h2>
+      <span class="counter --note">{{ profileData?.totalNotes }} notes</span>
+    </div>
+    <a routerLink="./notes" class="see-all --note">See All</a>
+  </div><!-- End of section header -->
+  <!-- Section body -->
+  <div class="section-body"></div><!-- End of section body -->
+</section><!-- End of note section -->
+<!-- Book section -->
+<section class="book-section" *ngIf="profileData?.totalBooks > 0">
+  <!-- Section header -->
+  <div class="section-header">
+    <div class="inner-header-wrapper">
+      <h2 class="section-title --book">Books</h2>
+      <span class="counter --book">{{ profileData?.totalBooks }} books</span>
+    </div>
+    <a routerLink="./books" class="see-all --book">See All</a>
+  </div><!-- End of section header -->
+  <!-- Section body -->
+  <div class="section-body"></div><!-- End of section body -->
+</section><!-- End of book section -->

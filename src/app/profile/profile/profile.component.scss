@@ -1,0 +1,119 @@
+@import '../../share/variable.scss';
+
+.basic-info {
+  margin: 1.5rem 0;
+  margin-bottom: 2.5rem;
+}
+/** Profile wrapper **/
+.profile-wrapper {
+  display: flex;
+  align-items: center;
+  .profile-img-wrapper {
+    flex: 1;
+    margin-right: 2rem;
+  }
+  .stats-wrapper {
+    flex: 3;
+  }
+}
+.follow-action-wrapper {
+  text-align: right;
+  margin-top: 2rem;
+}
+.profile-img {
+  width: 100%;
+  max-width: 150px;
+  border-radius: 50%;
+  margin: auto 0;
+}
+.profile__name {
+  color: $black;
+  font-size: 1.5rem;
+}
+/** Follow Section **/
+.follow-inner-wrapper {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  .follow__title {
+    width: 50%;
+    color: $black;
+  }
+  .follow__title,
+  .follow__detail {
+    font-size: 1rem;
+  }
+  .follow__detail {
+    margin-left: auto;
+    cursor: pointer;
+    color: $blue;
+    text-decoration: underline;
+  }
+}
+/*** Vocab / Note / Book Section ***/
+.vocab-section,
+.note-section,
+.book-section {
+  margin-bottom: 1.5rem;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+}
+.inner-header-wrapper {
+  display: flex;
+  align-items: center;
+}
+.section-title {
+  color: $black;
+  font-size: 1rem;
+  font-weight: 700;
+  margin-right: 1rem;
+}
+.counter {
+  color: $lightGray;
+}
+.see-all {
+  background: none;
+  border: none;
+  text-decoration: underline;
+  color: $black;
+  margin-left: auto;
+  font-size: 0.9rem;
+}
+
+@media(min-width: 480px) {
+  .basic-info {
+    display: flex;
+    margin-bottom: 5rem;
+  }
+  .profile-wrapper {
+    flex: 1;
+    .profile-img-wrapper {
+      flex: 1;
+    }
+    .stats-wrapper {
+      flex: 5;
+    }
+  }
+  .follow-wrapper {
+    display: flex;
+    width: 80%;
+    .follow-inner-wrapper {
+      width: calc(40% - 2rem);
+      max-width: 200px;
+      margin-right: 5rem;
+    }
+  }
+}
+@media (min-width: 480px) and (max-width: 780px) {
+  .follow-wrapper .follow-inner-wrapper {
+    width: calc(50% - 2rem);
+    margin-right: 2rem;
+    .follow__title {
+      width: unset;
+      margin-right: unset;
+    }
+  }
+}

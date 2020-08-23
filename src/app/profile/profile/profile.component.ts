@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { ProfileService } from '../profile.service';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-profile',
@@ -13,7 +14,8 @@ export class ProfileComponent implements OnInit {
   profileData = null;
 
   constructor(public readonly activatedRoute: ActivatedRoute,
-              public readonly profileService: ProfileService) { }
+              public readonly profileService: ProfileService,
+              public readonly location: Location) { }
 
   ngOnInit(): void {
     this.activatedRoute.paramMap.subscribe(params => {
@@ -21,6 +23,10 @@ export class ProfileComponent implements OnInit {
       this.profileId = id;
       this.getData();
     })
+  }
+
+  back(): void {
+    this.location.back();
   }
 
   /**
