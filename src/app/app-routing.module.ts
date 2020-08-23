@@ -17,6 +17,10 @@ export const routes: Routes = [
   {
     path: 'note',
     loadChildren: () => import('./note/note.module').then(m => m.NoteModule)
+  },
+  {
+    path: 'profile',
+    loadChildren: () => import('./profile/profile.module').then(m => m.ProfileModule)
   }
 ];
 
