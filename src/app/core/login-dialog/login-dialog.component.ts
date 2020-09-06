@@ -52,13 +52,17 @@ export class LoginDialogComponent implements OnInit {
   fbLogin() {
     FB.login(
       (response) => {
-        if (response.status === 'connected'){
-          const fbid = response.authResponse.userID;
-          const fb_token = response.authResponse.accessToken;
-          // this.router.navigate(['/']);
-          // this.register();
+        console.log('FB response', response);
+        if (response.status === 'connected') {
+          this.getFBDetail();
         }
-      }
+      }, {scope: 'public_profile,email'}
     );
+  }
+
+  getFBDetail(): void {
+    FB.api('/me', { fields: 'name,email' }, (response) => {
+      console.log('Successful login for: ' + response.name, response);
+    });
   }
 }
