@@ -1,4 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, NgZone } from '@angular/core';
+import { LoginService } from './login.service';
+import { MatDialogRef } from '@angular/material/dialog';
 declare var FB;
 @Component({
   selector: 'app-login-dialog',
@@ -36,7 +38,9 @@ export class LoginDialogComponent implements OnInit {
       author: null
     }
   ];
-  constructor() { }
+  constructor(public dialogRef: MatDialogRef<LoginDialogComponent>,
+              private loginService: LoginService,
+              private ngZone: NgZone) { }
 
   ngOnInit(): void {
     this.selectedQuote = this.randomQuotes();
@@ -55,6 +59,10 @@ export class LoginDialogComponent implements OnInit {
         console.log('FB response', response);
         if (response.status === 'connected') {
           this.getFBDetail();
+        } else {
+          localStorage.clear();
+          // TODO: Show warning message
+          this.dialogRef.close(false);
         }
       }, {scope: 'public_profile,email'}
     );
@@ -63,6 +71,26 @@ export class LoginDialogComponent implements OnInit {
   getFBDetail(): void {
     FB.api('/me', { fields: 'name,email' }, (response) => {
       console.log('Successful login for: ' + response.name, response);
+      this.loginService.login(response.id, response.email, response.name)
+          .subscribe(
+            res => {
+              console.log('res', res);
+              localStorage.setItem('userObj', JSON.stringify(res));
+              // Store user info in localStorage
+              this.ngZone.run(() => {
+                this.dialogRef.close(true);
+              });
+            },
+            err => {
+              localStorage.clear();
+              if (err.error) {
+                console.error(err.error);
+                this.dialogRef.close(false);
+                // TODO: Show error message
+              }
+            }
+          );
     });
   }
+
 }

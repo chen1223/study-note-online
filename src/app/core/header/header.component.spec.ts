@@ -7,6 +7,11 @@ import { MatDialog } from '@angular/material/dialog';
 import { By } from '@angular/platform-browser';
 import { Component } from '@angular/core';
 import { of } from 'rxjs';
+import { LoginService } from '../login-dialog/login.service';
+
+class MockLoginService {
+  loadUserData() {}
+}
 
 @Component({
   selector: 'app-login-dialog',
@@ -18,6 +23,7 @@ describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
   let dialogRefSpyObj = jasmine.createSpyObj({ afterClosed : of({}), close: null });
+  let mockLoginService: LoginService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -28,6 +34,9 @@ describe('HeaderComponent', () => {
       imports: [
         FontAwesomeModule,
         MaterialModule
+      ],
+      providers: [
+        { provide: LoginService, useClass: MockLoginService }
       ]
     })
     .compileComponents();
@@ -36,6 +45,7 @@ describe('HeaderComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(HeaderComponent);
     component = fixture.componentInstance;
+    mockLoginService = TestBed.inject(LoginService);
     fixture.detectChanges();
   });
 
@@ -93,4 +103,5 @@ describe('HeaderComponent', () => {
     fixture.detectChanges();
     expect(fnc).toHaveBeenCalled();
   });
+
 });

@@ -20,7 +20,7 @@
         <li class="item" (click)="closeMenu()"><a routerLink="/" class="link __home action-item">Home</a></li>
         <li class="item" (click)="closeMenu()">
           <ng-container *ngIf="isLogin;else loginBtn">
-            <a routerLink="/profile" class="link __login action-item">Profile</a>
+            <a [routerLink]="['profile', loginService?.userObj?.user?.username]" class="link __login action-item">Profile</a>
           </ng-container>
           <ng-template #loginBtn>
             <button (click)="openLoginDialog($event)" class="action-item __login" type="button" aria-label="Login / Sign up">Login / Signup</button>

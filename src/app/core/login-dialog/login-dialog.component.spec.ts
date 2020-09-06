@@ -1,14 +1,27 @@
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LoginDialogComponent } from './login-dialog.component';
 import { By } from '@angular/platform-browser';
+import { of } from 'rxjs';
+import { LoginService } from './login.service';
+
+class MockLoginService {
+  login(fbid, email, name) {
+    return of({});
+  }
+}
+
+class MockMatDialogRef {
+  close(data: any) {}
+}
 
 describe('LoginDialogComponent', () => {
   let component: LoginDialogComponent;
   let fixture: ComponentFixture<LoginDialogComponent>;
   let quote;
+  let mockLoginService: LoginService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -16,6 +29,10 @@ describe('LoginDialogComponent', () => {
       imports: [
         MatDialogModule,
         FontAwesomeModule
+      ],
+      providers: [
+        { provide: LoginService, useClass: MockLoginService },
+        { provide: MatDialogRef, useClass: MockMatDialogRef }
       ]
     })
     .compileComponents();
@@ -24,6 +41,7 @@ describe('LoginDialogComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(LoginDialogComponent);
     component = fixture.componentInstance;
+    mockLoginService = TestBed.inject(LoginService);
     fixture.detectChanges();
     quote = {
       line: 'An apple a day, keeps a doctor away.',
@@ -106,5 +124,12 @@ describe('LoginDialogComponent', () => {
     btn.click();
     fixture.detectChanges();
     expect(fnc).toHaveBeenCalled();
+  });
+
+  /**
+   * getFBDetail function related tests
+   */
+  it('should have function called getFBDetail', () => {
+    expect(component.getFBDetail).toBeDefined();
   });
 });

@@ -7,6 +7,7 @@ import { FloatBtnComponent } from './float-btn/float-btn.component';
 import { HomeComponent } from './home/home.component';
 import { MaterialModule } from '../share/material.module';
 import { LoginDialogComponent } from './login-dialog/login-dialog.component';
+import { HttpClientModule } from '@angular/common/http';
 
 
 
@@ -21,7 +22,8 @@ import { LoginDialogComponent } from './login-dialog/login-dialog.component';
     CommonModule,
     CoreRoutingModule,
     ShareModule,
-    MaterialModule
+    MaterialModule,
+    HttpClientModule
   ],
   exports: [
     HeaderComponent,

@@ -1,6 +1,7 @@
 import { LoginDialogComponent } from './../login-dialog/login-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Component, OnInit } from '@angular/core';
+import { LoginService } from '../login-dialog/login.service';
 
 @Component({
   selector: 'app-header',
@@ -11,7 +12,8 @@ export class HeaderComponent implements OnInit {
 
   isLogin = false;
   isActive = false;
-  constructor(public readonly matDialog: MatDialog) { }
+  constructor(public readonly matDialog: MatDialog,
+              public readonly loginService: LoginService) { }
 
   ngOnInit(): void {
   }
@@ -42,6 +44,10 @@ export class HeaderComponent implements OnInit {
       width: '500px'
     });
     dialogRef.afterClosed().subscribe(result => {
+      this.isLogin = result;
+      if (this.isLogin) {
+        this.loginService.loadUserData();
+      }
       this.closeMenu();
     });
   }

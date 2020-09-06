@@ -6,7 +6,7 @@ export const environment = {
   production: false
 };
 
-export const API_ENDPOINT = 'http://0.0.0.0:8000/api';
+export const API_ENDPOINT = 'https://bill-8bc9c9c2.localhost.run/api';
 /*
  * For easier debugging in development mode, you can import the following file
  * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
