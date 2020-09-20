@@ -1,9 +1,10 @@
 import { FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
 import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
 import { Location, isPlatformBrowser } from '@angular/common';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { VocabService } from './../vocab.service';
 import * as moment from 'moment';
+import { LoginService } from 'src/app/core/login-dialog/login.service';
 
 @Component({
   selector: 'app-vocab-detail',
@@ -48,6 +49,8 @@ export class VocabDetailComponent implements OnInit {
               public readonly fb: FormBuilder,
               public vocabService: VocabService,
               public readonly activatedRoute: ActivatedRoute,
+              private loginService: LoginService,
+              private router: Router,
               @Inject(PLATFORM_ID) platformId: Object) {
     this.isBrowser = isPlatformBrowser(platformId);
   }
@@ -106,12 +109,17 @@ export class VocabDetailComponent implements OnInit {
         .subscribe(
           res => {
             console.log('form before', this.form);
-            const data = res['data'];
-            data['_publishedDate'] = moment(new Date(data['publishedDate'])).format('MMM DD, YYYY');
-            this.form.patchValue(data);
+
+            // Format publishedDate
+            const publishedDateKey = 'publishedDate';
+            res['_publishedDate'] = res[publishedDateKey] ? moment(new Date(res[publishedDateKey])).format('MMM DD, YYYY') : '';
+
+            // Set profile picture
+            res['author']['profilePic'] = res['author']['picture'];
+            this.form.patchValue(res);
             (this.form.get('vocabs') as FormArray).clear();
             this.title = this.form.get('title').value;
-            const vocabs = data['vocabs'];
+            const vocabs = res['vocabs'];
             if (vocabs) {
               vocabs.forEach(vocab => {
                 this.addVocab(false, vocab);
@@ -250,14 +258,23 @@ export class VocabDetailComponent implements OnInit {
    */
   onSubmit(): void {
     const valid = this.isFormValid();
+    console.log('form valid', valid);
     if (!valid) {
       return;
     }
     const body = this.form.getRawValue();
-    const apiCall = this.mode === 'create' ? this.vocabService.postVocab(body) : this.vocabService.patchVocab(body);
+    const apiCall = this.mode === 'create' ? this.vocabService.postVocab(body) : this.vocabService.patchVocab(this.vocabId, body);
     apiCall.subscribe(
-      res => {},
-      err => {}
+      res => {
+        console.log('Vocab save response', res);
+        const idKey = 'id';
+        const packId = res[idKey];
+        // TODO: Show successful message
+        this.router.navigateByUrl(`/vocab/view/${packId}`);
+      },
+      err => {
+        console.log('Vocab save error', err);
+      }
     );
   }
 }

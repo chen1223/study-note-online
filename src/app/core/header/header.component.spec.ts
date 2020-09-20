@@ -22,7 +22,7 @@ export class MockLoginDialogComponent {}
 describe('HeaderComponent', () => {
   let component: HeaderComponent;
   let fixture: ComponentFixture<HeaderComponent>;
-  let dialogRefSpyObj = jasmine.createSpyObj({ afterClosed : of({}), close: null });
+  const dialogRefSpyObj = jasmine.createSpyObj({ afterClosed : of({}), close: null });
   let mockLoginService: LoginService;
 
   beforeEach(async(() => {
@@ -91,6 +91,8 @@ describe('HeaderComponent', () => {
     expect(component.openLoginDialog).toBeTruthy();
   });
   it('should call openLoginDialog on login / signup click', () => {
+    component.isLogin = false;
+    fixture.detectChanges();
     const el = (fixture.debugElement.query(By.css('.action-item.__login')).nativeElement) as HTMLButtonElement;
     const fnc = spyOn(component, 'openLoginDialog').and.callFake(() => {});
     el.click();
@@ -104,4 +106,13 @@ describe('HeaderComponent', () => {
     expect(fnc).toHaveBeenCalled();
   });
 
+
+  /**
+   * afterViewInit related tests
+   */
+  it('should call LoginService.loadUserData in ngAfterViewInit', () => {
+    const fnc = spyOn(mockLoginService, 'loadUserData');
+    component.ngAfterViewInit();
+    expect(fnc).toHaveBeenCalled();
+  });
 });

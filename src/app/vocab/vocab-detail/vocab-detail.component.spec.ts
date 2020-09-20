@@ -12,7 +12,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { of, Observable } from 'rxjs';
 import { IndexCardComponent } from './index-card/index-card.component';
 import { VocabService } from './../vocab.service';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 import * as moment from 'moment';
 
 const dummyVocabData = {
@@ -25,7 +25,7 @@ const dummyVocabData = {
     name: 'Bill Chen',
     username: 'billchen',
     // tslint:disable-next-line: max-line-length
-    profilePic: 'https://images.unsplash.com/photo-1522039553440-46d3e1e61e4a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=200&q=60'
+    picture: 'https://images.unsplash.com/photo-1522039553440-46d3e1e61e4a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=200&q=60'
   },
   vocabs: [
     {
@@ -64,7 +64,7 @@ class MockActivatedRoute {
 
 class MockVocabService {
   getVocabPack(id): Observable<object> {
-    return of({ data: dummyVocabData });
+    return of(dummyVocabData);
   }
   postVocab(body): Observable<object> {
     return of({});
@@ -100,6 +100,7 @@ describe('VocabDetailComponent', () => {
   let mockActivatedRoute;
   let mockHttp: HttpTestingController;
   let mockVocabService;
+  let http: HttpClient;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -146,7 +147,8 @@ describe('VocabDetailComponent', () => {
         {
           provide: VocabService,
           useClass: MockVocabService
-        }
+        },
+        { provide: HttpClient }
       ]
     })
     .compileComponents();
@@ -159,6 +161,7 @@ describe('VocabDetailComponent', () => {
     mockActivatedRoute = TestBed.inject(ActivatedRoute);
     mockVocabService = TestBed.inject(VocabService);
     mockHttp = TestBed.inject(HttpTestingController);
+    http = TestBed.inject(HttpClient);
     (component.form.get('vocabs') as FormArray).clear();
     // Set default mode to create
     component.mode = 'create';
@@ -253,12 +256,14 @@ describe('VocabDetailComponent', () => {
     expect(component.getVocab).toBeDefined();
   });
   it('should call getVocabPack service when getVocab is called', fakeAsync(() => {
-    const api = spyOn(mockVocabService, 'getVocabPack').and.returnValue(of({ data: {} }));
+    const api = spyOn(mockVocabService, 'getVocabPack').and.returnValue(of(dummyVocabData));
     const dummyId = 1;
     mockActivatedRoute.paramMap = of({ get: () => dummyId });
     component.getVocab(dummyId);
     fixture.detectChanges();
+    tick();
     expect(api).toHaveBeenCalledWith(dummyId);
+    mockHttp.verify();
   }));
   it('should call resetForm and clear vocabs array when getVocab is called', fakeAsync(() => {
     mockActivatedRoute.data = of({ mode: 'view' });
@@ -293,7 +298,7 @@ describe('VocabDetailComponent', () => {
     expect(form.get('saves').value).toEqual(dummyVocabData.saves);
     expect((form.get('author') as FormGroup).get('name').value).toEqual(dummyVocabData.author.name);
     expect((form.get('author') as FormGroup).get('username').value).toEqual(dummyVocabData.author.username);
-    expect((form.get('author') as FormGroup).get('profilePic').value).toEqual(dummyVocabData.author.profilePic);
+    expect((form.get('author') as FormGroup).get('profilePic').value).toEqual(dummyVocabData.author.picture);
   }));
 
 
@@ -937,5 +942,26 @@ describe('VocabDetailComponent', () => {
     expect(patchFnc).toHaveBeenCalled();
     expect(postFnc).not.toHaveBeenCalled();
   });
-  it('should verify at least one index card onSubmit', () => {});
+  it('should navigate to view vocab page on create success', fakeAsync(() => {
+    component.mode = 'create';
+    const form = component.form;
+    form.get('title').setValue('123');
+    const vocabsArray = form.get('vocabs') as FormArray;
+    vocabsArray.controls.forEach(item => {
+      item.get('vocab').setValue('123');
+      item.get('desc').setValue('123');
+    });
+    const fnc = spyOn(router, 'navigateByUrl');
+    const mockUrl = 'test123';
+    spyOn(mockVocabService, 'postVocab').and.callFake(() => {
+      return http.post(mockUrl, form.getRawValue());
+    });
+    component.onSubmit();
+    const mockRequest = mockHttp.expectOne(mockUrl);
+    const mockId = 2;
+    mockRequest.flush({ id: mockId }, { status: 200, statusText: '' });
+    mockHttp.verify();
+    tick();
+    expect(fnc).toHaveBeenCalledWith(`/vocab/view/${mockId}`);
+  }));
 });

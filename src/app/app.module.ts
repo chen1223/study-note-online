@@ -21,7 +21,8 @@ import { faThumbsUp, faBookmark } from '@fortawesome/free-regular-svg-icons';
 import { ShareModule } from './share/share.module';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthInterceptorService } from './share/auth-interceptor.service';
 
 
 @NgModule({
@@ -37,7 +38,13 @@ import { HttpClientModule } from '@angular/common/http';
     BrowserAnimationsModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthInterceptorService,
+      multi: true
+    }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule {

@@ -1,6 +1,6 @@
 import { LoginDialogComponent } from './../login-dialog/login-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { LoginService } from '../login-dialog/login.service';
 
 @Component({
@@ -8,7 +8,7 @@ import { LoginService } from '../login-dialog/login.service';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, AfterViewInit {
 
   isLogin = false;
   isActive = false;
@@ -16,6 +16,17 @@ export class HeaderComponent implements OnInit {
               public readonly loginService: LoginService) { }
 
   ngOnInit(): void {
+  }
+
+  ngAfterViewInit(): void {
+    this.loginService.loadUserData();
+    setTimeout(() => {
+      this.setLoginStatus();
+    }, 0);
+  }
+
+  setLoginStatus(): void {
+    this.isLogin = this.loginService.userObj !== null;
   }
 
   toggleMenu() {
@@ -47,6 +58,11 @@ export class HeaderComponent implements OnInit {
       this.isLogin = result;
       if (this.isLogin) {
         this.loginService.loadUserData();
+        const userObj = this.loginService.userObj.user;
+        const picKey = 'picture';
+        if (!userObj[picKey]) {
+          this.loginService.getPicLink(userObj.fbid);
+        }
       }
       this.closeMenu();
     });

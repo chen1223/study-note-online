@@ -96,4 +96,18 @@ describe('LoginService', () => {
     service.clearUserData();
     expect(fnc).toHaveBeenCalled();
   });
+
+  /**
+   * updatePicture related tests
+   */
+  it('should define a function called updatePicture', () => {
+    expect(service.updatePicture).toBeDefined();
+  });
+  it('should send PUT request to backend when updatePicture is called', fakeAsync(() => {
+    const dummyData = {};
+    service.updatePicture(dummyData).subscribe(res => {});
+    const mockRequest = httpMock.expectOne(API.USERS_PIC);
+    expect(mockRequest.request.method).toEqual('PUT');
+    httpMock.verify();
+  }));
 });

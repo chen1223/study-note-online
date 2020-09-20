@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, NgZone } from '@angular/core';
 import { LoginService } from './login.service';
 import { MatDialogRef } from '@angular/material/dialog';
@@ -40,6 +41,7 @@ export class LoginDialogComponent implements OnInit {
   ];
   constructor(public dialogRef: MatDialogRef<LoginDialogComponent>,
               private loginService: LoginService,
+              private http: HttpClient,
               private ngZone: NgZone) { }
 
   ngOnInit(): void {
@@ -64,13 +66,13 @@ export class LoginDialogComponent implements OnInit {
           // TODO: Show warning message
           this.dialogRef.close(false);
         }
-      }, {scope: 'public_profile,email'}
+      }, {scope: 'public_profile,email,user_link'}
     );
   }
 
   getFBDetail(): void {
     FB.api('/me', { fields: 'name,email' }, (response) => {
-      console.log('Successful login for: ' + response.name, response);
+      console.log('Successful login in for: ' + response.name, response);
       this.loginService.login(response.id, response.email, response.name)
           .subscribe(
             res => {
@@ -78,6 +80,7 @@ export class LoginDialogComponent implements OnInit {
               localStorage.setItem('userObj', JSON.stringify(res));
               // Store user info in localStorage
               this.ngZone.run(() => {
+                console.log('closing dialog')
                 this.dialogRef.close(true);
               });
             },
@@ -92,5 +95,4 @@ export class LoginDialogComponent implements OnInit {
           );
     });
   }
-
 }

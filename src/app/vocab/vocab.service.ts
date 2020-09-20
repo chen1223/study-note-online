@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { API } from '../share/api.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class VocabService {
+
 
   dummyVocabPack = {
     id: 1,
@@ -48,33 +50,17 @@ export class VocabService {
    * Get single vocab pack
    */
   getVocabPack(id): Observable<object> {
-    return new Observable(observer => {
-      setTimeout(() => {
-        observer.next({
-          data: this.dummyVocabPack
-        });
-        observer.complete();
-      }, 50);
-    });
+    const url = `${API.VOCABS}/${id}`;
+    return this.http.get(url);
   }
 
   postVocab(body): Observable<object> {
-    console.log('postVocab called');
-    return new Observable(observer => {
-      setTimeout(() => {
-        observer.next({});
-        observer.complete();
-      }, 50);
-    });
+    const url = API.VOCABS;
+    return this.http.post(url, body);
   }
 
-  patchVocab(body): Observable<object> {
-    console.log('patchVocab called');
-    return new Observable(observer => {
-      setTimeout(() => {
-        observer.next({});
-        observer.complete();
-      }, 50);
-    });
+  patchVocab(id, body): Observable<object> {
+    const url = `${API.VOCABS}/${id}`;
+    return this.http.patch(url, body);
   }
 }

@@ -6,6 +6,7 @@ import { LoginDialogComponent } from './login-dialog.component';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { LoginService } from './login.service';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 
 class MockLoginService {
   login(fbid, email, name) {
@@ -28,7 +29,8 @@ describe('LoginDialogComponent', () => {
       declarations: [ LoginDialogComponent ],
       imports: [
         MatDialogModule,
-        FontAwesomeModule
+        FontAwesomeModule,
+        HttpClientTestingModule
       ],
       providers: [
         { provide: LoginService, useClass: MockLoginService },
