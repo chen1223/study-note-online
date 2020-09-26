@@ -15,6 +15,7 @@
   font-size: 1.4em;
 }
 .brand-icon {
+  margin: 0;
   text-align: center;
   .__icon {
     width: 6em;
@@ -30,7 +31,6 @@
 .quote-wrapper {
   width: 80%;
   margin: 0 auto;
-  margin-top: 3em;
   text-align: left;
 }
 .author-wrapper {
@@ -38,7 +38,6 @@
   width: 80%;
   margin: 0 auto;
   margin-top: .5em;
-  margin-bottom: 3em;
 }
 .author {
   position: relative;
@@ -50,32 +49,76 @@
   }
 }
 
-button.fbBtn {
-  margin: 2em auto;
-  margin-bottom: 1em;
+/* Loading dots */
+.loading-wrapper {
   display: flex;
-  background: #4267b2;
-  color: #fff;
-  border: none;
-  border-radius: 3px;
-  padding: .5em 1em;
-  font-size: 14px;
-  cursor: pointer;
-  .fb__icon {
-    font-size: 1.2em;
+}
+.dot {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: auto;
+}
+.dot div {
+  position: absolute;
+  top: 33px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: $orange;
+  animation-timing-function: cubic-bezier(0, 1, 1, 0);
+}
+.dot div:nth-child(1) {
+  left: 8px;
+  animation: dot1 0.6s infinite;
+}
+.dot div:nth-child(2) {
+  left: 8px;
+  animation: dot2 0.6s infinite;
+}
+.dot div:nth-child(3) {
+  left: 32px;
+  animation: dot2 0.6s infinite;
+}
+.dot div:nth-child(4) {
+  left: 56px;
+  animation: dot3 0.6s infinite;
+}
+@keyframes dot1 {
+  0% {
+    transform: scale(0);
   }
-  span{
-    margin: auto;
-    margin-left: .5em;
-    font-size: 1em;
+  100% {
+    transform: scale(1);
   }
 }
+@keyframes dot3 {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(0);
+  }
+}
+@keyframes dot2 {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(24px, 0);
+  }
+}
+
 ::ng-deep {
-  .login-panel {
+  .loading-panel {
     .mat-dialog-container {
       padding: 0;
       background: $bgColor;
       overflow-x: hidden;
+    }
+    .dialog-body {
+      padding: 2rem;
     }
   }
 }
@@ -130,20 +173,6 @@ button.fbBtn {
     .quote-wrapper,
     .author-wrapper {
       width: 90%;
-    }
-    .quote-wrapper {
-      margin-top: 1em;
-    }
-    .author-wrapper {
-      margin-bottom: .5em;
-    }
-    button.fbBtn {
-      .fb__icon {
-        font-size: 1em;
-      }
-      span {
-        font-size: .95em;
-      }
     }
   }
 }

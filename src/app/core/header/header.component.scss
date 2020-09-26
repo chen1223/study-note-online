@@ -1,4 +1,4 @@
-@import '../../share/variable.scss';
+@import '../../share/scss/variable.scss';
 
 .header {
   background: $gradientBg;
@@ -28,7 +28,7 @@
   display: flex;
 }
 .brand {
-  font-size: 1.3em;
+  font-size: 1em;
   margin: auto 0;
   &.__icon {
     margin-right: .5em;

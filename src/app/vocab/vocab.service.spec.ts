@@ -83,4 +83,20 @@ describe('VocabService', () => {
     httpMock.verify();
   }));
 
+  /**
+   * putVocabStatus related tests
+   */
+  it('should define a function called putVocabStatus', () => {
+    expect(service.putVocabStatus).toBeDefined();
+  });
+  it('should send PUT request to VOCABS endpoint when putVocabsStatus is called', fakeAsync(() => {
+    const url = API.VOCABS;
+    const mockId = 1;
+    const mockStatus = 'published';
+    service.putVocabStatus(mockId, mockStatus).subscribe(res => {});
+    const mockRequest = httpMock.expectOne(`${url}/status/${mockId}`);
+    expect(mockRequest.request.method).toEqual('PUT');
+    expect(mockRequest.request.body).toEqual({ status: mockStatus });
+    httpMock.verify();
+  }));
 });

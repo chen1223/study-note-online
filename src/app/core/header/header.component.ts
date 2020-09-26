@@ -47,6 +47,20 @@ export class HeaderComponent implements OnInit, AfterViewInit {
     body.classList.remove('--menu-opened');
   }
 
+  dummyLogin(): void {
+    this.loginService.login('10224290489872868', 'chen1223@bu.edu', 'Bill Chen')
+        .subscribe(res => {
+          this.isLogin = true;
+          localStorage.setItem('userObj', JSON.stringify(res));
+          this.loginService.loadUserData();
+          const userObj = this.loginService.userObj.user;
+          const picKey = 'picture';
+          if (!userObj[picKey]) {
+            this.loginService.getPicLink(userObj.fbid);
+          }
+        })
+  }
+
   // On user clicks on login / signup
   openLoginDialog(event): void {
     event.stopPropagation();

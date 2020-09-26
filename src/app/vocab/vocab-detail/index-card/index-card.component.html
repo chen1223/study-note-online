@@ -23,7 +23,7 @@
               <div class="card--front">
                 <!-- Card body -->
                 <div class="card__body">
-                  <span class="vocab">{{ selectedVocab?.vocab }}</span>
+                  <span class="name">{{ selectedVocab?.name }}</span>
                 </div><!-- End of card body -->
               </div>
             </div><!-- End of Front -->
@@ -87,10 +87,10 @@
             <!-- Card body -->
             <div class="card__body">
               <ng-container *ngIf="mode !== 'view';else viewFront">
-                <input type="text" class="ctrl vocab" formControlName="vocab">
+                <input type="text" class="ctrl name" formControlName="name">
               </ng-container>
               <ng-template #viewFront>
-                <span class="vocab">{{ item.get('vocab').value }}</span>
+                <span class="name">{{ item.get('name').value }}</span>
               </ng-template>
             </div><!-- End of card body -->
           </div>

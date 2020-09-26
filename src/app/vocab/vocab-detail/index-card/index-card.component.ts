@@ -27,7 +27,7 @@ export class IndexCardComponent implements OnInit, OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     // tslint:disable-next-line: no-string-literal
-    if (changes['presentationMode']['currentValue'] === true) {
+    if (changes['presentationMode'] && changes['presentationMode']['currentValue'] === true) {
       this.initCarousel();
     }
   }

@@ -1,4 +1,4 @@
-@import '../../../share/variable.scss';
+@import '../../../share/scss/variable.scss';
 
 /* Index card ratio */
 $cardRatio: calc(795 / 466);
@@ -96,7 +96,7 @@ $width: 100%;
 }
 .--view-mode,
 .carousel-wrapper {
-  .card--front .card__body .vocab {
+  .card--front .card__body .name {
     border-bottom: none;
     text-align: center;
   }
@@ -106,7 +106,7 @@ $width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    .vocab {
+    .name {
       border: none;
       background: none;
       border-bottom: 2px solid $lineColor;
@@ -114,7 +114,7 @@ $width: 100%;
       padding: 0 1em;
       width: 50%;
     }
-    .vocab.ng-invalid.ng-touched {
+    .name.ng-invalid.ng-touched {
       border-color: $red;
     }
   }

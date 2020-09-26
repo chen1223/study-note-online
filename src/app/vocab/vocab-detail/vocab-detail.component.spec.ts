@@ -1,7 +1,9 @@
+import { API } from './../../share/api.model';
+import { MatDialogModule } from '@angular/material/dialog';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MaterialModule } from './../../share/material.module';
-import { async, ComponentFixture, TestBed, fakeAsync, tick, flush } from '@angular/core/testing';
+import { async, ComponentFixture, TestBed, fakeAsync, tick, flush, ComponentFixtureAutoDetect } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 
 import { VocabDetailComponent } from './vocab-detail.component';
@@ -14,6 +16,8 @@ import { IndexCardComponent } from './index-card/index-card.component';
 import { VocabService } from './../vocab.service';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import * as moment from 'moment';
+import { LoadingService } from 'src/app/share/loading.service';
+import { Location } from '@angular/common';
 
 const dummyVocabData = {
   id: 1,
@@ -27,21 +31,22 @@ const dummyVocabData = {
     // tslint:disable-next-line: max-line-length
     picture: 'https://images.unsplash.com/photo-1522039553440-46d3e1e61e4a?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=200&q=60'
   },
+  isAuthor: false,
   vocabs: [
     {
-      vocab: 'micronda',
+      name: 'micronda',
       desc: 'noun. microwave'
     },
     {
-      vocab: 'televición',
+      name: 'televición',
       desc: 'noun. television'
     },
     {
-      vocab: 'ordenador',
+      name: 'ordenador',
       desc: 'noun. computer'
     },
     {
-      vocab: 'patalla',
+      name: 'patalla',
       desc: 'noun. monitor'
     }
   ]
@@ -72,6 +77,14 @@ class MockVocabService {
   patchVocab(body): Observable<object> {
     return of({});
   }
+  putVocabStatus(id, status): Observable<object> {
+    return of({});
+  }
+}
+
+class MockLoadingService {
+  show() {}
+  hide() {}
 }
 
 @Component({
@@ -79,7 +92,7 @@ class MockVocabService {
   template: `
     <div class="card-wrapper">
       <div class="card--front">
-        <input class="ctrl vocab">
+        <input class="ctrl name">
       </div>
       <div class="card--back">
         <textarea class="desc"></textarea>
@@ -99,7 +112,9 @@ describe('VocabDetailComponent', () => {
   let router: Router;
   let mockActivatedRoute;
   let mockHttp: HttpTestingController;
-  let mockVocabService;
+  let mockVocabService: VocabService;
+  let mockLoadingService: LoadingService;
+  let location: Location;
   let http: HttpClient;
 
   beforeEach(async(() => {
@@ -115,6 +130,7 @@ describe('VocabDetailComponent', () => {
         HttpClientModule,
         HttpClientTestingModule,
         FontAwesomeModule,
+        MatDialogModule,
         RouterTestingModule.withRoutes([
           {
             path: 'vocab/new',
@@ -140,15 +156,11 @@ describe('VocabDetailComponent', () => {
         ])
       ],
       providers: [
-        {
-          provide: ActivatedRoute,
-          useClass: MockActivatedRoute
-        },
-        {
-          provide: VocabService,
-          useClass: MockVocabService
-        },
-        { provide: HttpClient }
+        { provide: ActivatedRoute, useClass: MockActivatedRoute },
+        { provide: VocabService, useClass: MockVocabService },
+        { provide: HttpClient },
+        { provide: LoadingService, useClass: MockLoadingService },
+        { provide: Location }
       ]
     })
     .compileComponents();
@@ -161,6 +173,8 @@ describe('VocabDetailComponent', () => {
     mockActivatedRoute = TestBed.inject(ActivatedRoute);
     mockVocabService = TestBed.inject(VocabService);
     mockHttp = TestBed.inject(HttpTestingController);
+    mockLoadingService = TestBed.inject(LoadingService);
+    location = TestBed.inject(Location);
     http = TestBed.inject(HttpClient);
     (component.form.get('vocabs') as FormArray).clear();
     // Set default mode to create
@@ -200,7 +214,7 @@ describe('VocabDetailComponent', () => {
     form.get('title').setValue('dummy title');
     const vocabArray = form.get('vocabs') as FormArray;
     vocabArray.push(new FormGroup({
-      vocab: new FormControl('', Validators.required),
+      name: new FormControl('', Validators.required),
       desc: new FormControl('', Validators.required)
     }));
     fixture.detectChanges();
@@ -250,6 +264,48 @@ describe('VocabDetailComponent', () => {
   }));
 
   /**
+   * initForm related tests
+   */
+  it('should define a function called initForm', () => {
+    expect(component.initForm).toBeDefined();
+  });
+  it('should call resetForm and clear vocabs array when initForm is called', () => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
+    component.vocabData = dummyVocabData;
+    component.setMode();
+    fixture.detectChanges();
+    component.addVocab();
+    component.vocabData = dummyVocabData;
+    fixture.detectChanges();
+    component.initForm();
+    fixture.detectChanges();
+    expect((component.form.get('vocabs') as FormArray).length).toEqual(dummyVocabData.vocabs.length);
+  });
+  it('should set form data after initForm is called', fakeAsync(() => {
+    mockActivatedRoute.data = of({ mode: 'view' });
+    mockActivatedRoute.paramMap = of({ get: () => 1 });
+    component.setMode();
+    component.vocabData = dummyVocabData;
+    const form = component.form;
+    form.reset();
+    fixture.detectChanges();
+    component.initForm();
+    tick();
+    fixture.detectChanges();
+    expect(form.get('title').value).toEqual(dummyVocabData.title);
+    expect((form.get('vocabs') as FormArray).length).toEqual(dummyVocabData.vocabs.length);
+    expect(form.get('publishedDate').value).toEqual(dummyVocabData.publishedDate);
+    const formattedDate = moment(new Date(dummyVocabData.publishedDate)).format('MMM DD, YYYY');
+    expect(form.get('_publishedDate').value).toEqual(formattedDate);
+    expect(form.get('likes').value).toEqual(dummyVocabData.likes);
+    expect(form.get('saves').value).toEqual(dummyVocabData.saves);
+    expect((form.get('author') as FormGroup).get('name').value).toEqual(dummyVocabData.author.name);
+    expect((form.get('author') as FormGroup).get('username').value).toEqual(dummyVocabData.author.username);
+    expect((form.get('author') as FormGroup).get('profilePic').value).toEqual(dummyVocabData.author.picture);
+  }));
+
+  /**
    * getVocab function related tests
    */
   it('should define getVocab function', () => {
@@ -265,21 +321,19 @@ describe('VocabDetailComponent', () => {
     expect(api).toHaveBeenCalledWith(dummyId);
     mockHttp.verify();
   }));
-  it('should call resetForm and clear vocabs array when getVocab is called', fakeAsync(() => {
-    mockActivatedRoute.data = of({ mode: 'view' });
-    mockActivatedRoute.paramMap = of({ get: () => 1 });
-    component.setMode();
-    fixture.detectChanges();
-    const fnc = spyOn(component, 'resetForm');
-    component.addVocab();
-    fixture.detectChanges();
+  it('should call initForm function when getVocab is called', () => {
+    const fnc = spyOn(component, 'initForm');
     component.getVocab(1);
-    tick();
-    fixture.detectChanges();
     expect(fnc).toHaveBeenCalled();
-    expect((component.form.get('vocabs') as FormArray).length).toEqual(dummyVocabData.vocabs.length);
-  }));
-  it('should set form data after getVocab is called', fakeAsync(() => {
+  });
+  it('should call resetForm function when getVocab is called', () => {
+    const fnc = spyOn(component, 'resetForm');
+    component.getVocab(1);
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should show loading dialog when getVocab is called and hide when api returns', fakeAsync(() => {
+    const showFnc = spyOn(mockLoadingService, 'show');
+    const hideFnc = spyOn(mockLoadingService, 'hide');
     mockActivatedRoute.data = of({ mode: 'view' });
     mockActivatedRoute.paramMap = of({ get: () => 1 });
     component.setMode();
@@ -287,18 +341,32 @@ describe('VocabDetailComponent', () => {
     form.reset();
     fixture.detectChanges();
     component.getVocab(1);
+    expect(showFnc).toHaveBeenCalled();
     tick();
     fixture.detectChanges();
-    expect(form.get('title').value).toEqual(dummyVocabData.title);
-    expect((form.get('vocabs') as FormArray).length).toEqual(dummyVocabData.vocabs.length);
-    expect(form.get('publishedDate').value).toEqual(dummyVocabData.publishedDate);
-    const formattedDate = moment(new Date(dummyVocabData.publishedDate)).format('MMM DD, YYYY');
-    expect(form.get('_publishedDate').value).toEqual(formattedDate);
-    expect(form.get('likes').value).toEqual(dummyVocabData.likes);
-    expect(form.get('saves').value).toEqual(dummyVocabData.saves);
-    expect((form.get('author') as FormGroup).get('name').value).toEqual(dummyVocabData.author.name);
-    expect((form.get('author') as FormGroup).get('username').value).toEqual(dummyVocabData.author.username);
-    expect((form.get('author') as FormGroup).get('profilePic').value).toEqual(dummyVocabData.author.picture);
+    expect(hideFnc).toHaveBeenCalled();
+  }));
+  it('should set isVocabLoaded to true when API returns', fakeAsync(() => {
+    component.isVocabLoaded = false;
+    fixture.detectChanges();
+    spyOn(mockVocabService, 'getVocabPack').and.returnValue(of(dummyVocabData));
+    const dummyId = 1;
+    mockActivatedRoute.paramMap = of({ get: () => dummyId });
+    component.getVocab(dummyId);
+    tick();
+    expect(component.isVocabLoaded).toBeTruthy();
+  }));
+  it('should set isAuthor when getVocab returns data', fakeAsync(() => {
+    component.isAuthor = false;
+    fixture.detectChanges();
+    dummyVocabData.isAuthor = true;
+    spyOn(mockVocabService, 'getVocabPack').and.returnValue(of(dummyVocabData));
+    const dummyId = 1;
+    mockActivatedRoute.paramMap = of({ get: () => dummyId });
+    component.getVocab(dummyId);
+    tick();
+    fixture.detectChanges();
+    expect(component.isAuthor).toEqual(dummyVocabData.isAuthor);
   }));
 
 
@@ -360,6 +428,7 @@ describe('VocabDetailComponent', () => {
   });
   it('should only show mode button in view mode', () => {
     component.mode = 'view';
+    component.isVocabLoaded = true;
     fixture.detectChanges();
     const elInViewMode = fixture.debugElement.query(By.css('.mode-row'));
     expect(elInViewMode).toBeTruthy();
@@ -455,6 +524,35 @@ describe('VocabDetailComponent', () => {
   });
 
   /**
+   * onCancel related tests
+   */
+  it('should return to home page when onCancel is called and if we are in create mode', () => {
+    component.mode = 'create';
+    fixture.detectChanges();
+    const fnc = spyOn(router, 'navigateByUrl');
+    component.onCancel();
+    expect(fnc).toHaveBeenCalledWith('');
+  });
+  it('should return to view page and disable form when onCancel is called and if we are in update mode', () => {
+    component.mode = 'update';
+    component.vocabId = 1;
+    component.vocabData = dummyVocabData;
+    component.form.enable();
+    fixture.detectChanges();
+    const fnc = spyOn(location, 'go');
+    component.onCancel();
+    expect(fnc).toHaveBeenCalledWith(`/vocab/view/1`);
+    expect(component.form.disabled).toBeTruthy();
+  });
+  it('should call initForm again when onCancel is called and if we are in update mode', () => {
+    component.mode = 'update';
+    fixture.detectChanges();
+    const fnc = spyOn(component, 'initForm');
+    component.onCancel();
+    expect(fnc).toHaveBeenCalled();
+  });
+
+  /**
    * Page title related tests
    */
   it('should have page title: New Vocabulary Pack in create mode', () => {
@@ -491,6 +589,7 @@ describe('VocabDetailComponent', () => {
   it('should only show detail section in view mode', () => {
     mockActivatedRoute.data = of({ mode: 'view' });
     component.setMode();
+    component.isVocabLoaded = true;
     fixture.detectChanges();
     const detailSecInView = fixture.debugElement.query(By.css('.detail-section'));
     expect(detailSecInView).toBeTruthy();
@@ -569,6 +668,8 @@ describe('VocabDetailComponent', () => {
     expect(el).toBeTruthy();
   });
   it('should define a FormControl called title with required validation', () => {
+    component.mode = 'create';
+    fixture.detectChanges();
     const ctrl = component.form.get('title');
     expect(ctrl).toBeTruthy();
     expect(ctrl).toBeInstanceOf(FormControl);
@@ -665,7 +766,7 @@ describe('VocabDetailComponent', () => {
   }));
   it('should add vocab to form array and set data if data is passed', () => {
     const dummyVocab = {
-      vocab: 'test',
+      name: 'test',
       desc: 'test desc'
     };
     const vocabArray = component.form.get('vocabs') as FormArray;
@@ -674,7 +775,7 @@ describe('VocabDetailComponent', () => {
     fixture.detectChanges();
     expect(vocabArray.length).toBe(1);
     const firstItem = vocabArray.at(0) as FormGroup;
-    expect(firstItem.get('vocab').value).toEqual(dummyVocab.vocab);
+    expect(firstItem.get('name').value).toEqual(dummyVocab.name);
     expect(firstItem.get('desc').value).toEqual(dummyVocab.desc);
   });
 
@@ -806,11 +907,14 @@ describe('VocabDetailComponent', () => {
    * Index card integration related tests
    */
   it('should have index card on the HTML', () => {
+    component.mode = 'create';
+    fixture.detectChanges();
     const indexCards = fixture.debugElement.query(By.css('app-index-card'));
-    expect(indexCards).toBeTruthy()
+    expect(indexCards).toBeTruthy();
   });
   it('should pass vocabs form array and mode to IndexCardComponent', () => {
     component.mode = 'create';
+    fixture.detectChanges();
     const vocabArray = component.form.get('vocabs') as FormArray;
     const indexCardComponent = fixture.debugElement.query(By.css('app-index-card')).componentInstance as IndexCardComponent;
     vocabArray.reset();
@@ -825,6 +929,7 @@ describe('VocabDetailComponent', () => {
    * Validation tests
    */
   it('should validate form title', () => {
+    component.mode = 'create';
     expect(component.isFormValid).toBeDefined();
     const form = component.form;
     const titleCtrl = form.get('title');
@@ -834,7 +939,7 @@ describe('VocabDetailComponent', () => {
 
     const vocabsArray = component.form.get('vocabs') as FormArray;
     vocabsArray.controls.forEach(item => {
-      item.get('vocab').setValue('123');
+      item.get('name').setValue('123');
       item.get('desc').setValue('123');
     });
     titleCtrl.setValue('123');
@@ -851,7 +956,7 @@ describe('VocabDetailComponent', () => {
   it('should validate at least one valid item in vocabs formarray', () => {
     const vocabsArray = component.form.get('vocabs') as FormArray;
     vocabsArray.push(new FormGroup({
-      vocab: new FormControl(''),
+      name: new FormControl(''),
       desc: new FormControl('')
     }));
     fixture.detectChanges();
@@ -860,27 +965,30 @@ describe('VocabDetailComponent', () => {
     const titleCtrl = component.form.get('title');
     titleCtrl.setValue('title');
     vocabsArray.controls.forEach(item => {
-      item.get('vocab').setValue('123');
+      item.get('name').setValue('123');
       item.get('desc').setValue('123');
     });
     fixture.detectChanges();
     expect(component.isFormValid()).toBeTruthy();
   });
   it('should mark form as touched when call isFormValid', () => {
+    component.mode = 'create';
     const markAllAsTouched = spyOn(component.form, 'markAllAsTouched');
     component.isFormValid();
     expect(markAllAsTouched).toHaveBeenCalled();
   });
   it('should return false when there are invalid controls', () => {
+    component.mode = 'create';
+    fixture.detectChanges();
     const form = component.form;
     form.get('title').setValue('123');
     const vocabsArray = form.get('vocabs') as FormArray;
     vocabsArray.push(new FormGroup({
-      vocab: new FormControl('123'),
+      name: new FormControl('123'),
       desc: new FormControl('123')
     }));
     vocabsArray.push(new FormGroup({
-      vocab: new FormControl(null),
+      name: new FormControl(null),
       desc: new FormControl(null)
     }));
     expect(component.isFormValid()).toBeFalsy();
@@ -890,7 +998,7 @@ describe('VocabDetailComponent', () => {
     form.get('title').setValue('123');
     const vocabsArray = form.get('vocabs') as FormArray;
     vocabsArray.controls.forEach(item => {
-      item.get('vocab').setValue('123');
+      item.get('name').setValue('123');
       item.get('desc').setValue('123');
     });
     expect(component.isFormValid()).toBeTruthy();
@@ -948,11 +1056,12 @@ describe('VocabDetailComponent', () => {
     form.get('title').setValue('123');
     const vocabsArray = form.get('vocabs') as FormArray;
     vocabsArray.controls.forEach(item => {
-      item.get('vocab').setValue('123');
+      item.get('name').setValue('123');
       item.get('desc').setValue('123');
     });
-    const fnc = spyOn(router, 'navigateByUrl');
+    const fnc = spyOn(location as Location, 'go');
     const mockUrl = 'test123';
+    spyOn(component, 'initForm');
     spyOn(mockVocabService, 'postVocab').and.callFake(() => {
       return http.post(mockUrl, form.getRawValue());
     });
@@ -963,5 +1072,188 @@ describe('VocabDetailComponent', () => {
     mockHttp.verify();
     tick();
     expect(fnc).toHaveBeenCalledWith(`/vocab/view/${mockId}`);
+  }));
+  it('should show loading dialog when onSubmit is called when hide when api returns', fakeAsync(() => {
+    const showFnc = spyOn(mockLoadingService, 'show');
+    const hideFnc = spyOn(mockLoadingService, 'hide');
+    const postFnc = spyOn(mockVocabService, 'postVocab').and.returnValue(of(dummyVocabData));
+    spyOn(component, 'isFormValid').and.returnValue(true);
+    component.mode = 'create';
+    fixture.detectChanges();
+    component.onSubmit();
+    expect(showFnc).toHaveBeenCalledWith('Saving your vocabularies...');
+    tick();
+    expect(hideFnc).toHaveBeenCalled();
+  }));
+
+  /**
+   * Publish row related tests
+   */
+  it('should only show publish-row in view mode', () => {
+    component.isAuthor = true;
+    component.mode = 'view';
+    fixture.detectChanges();
+    const viewEl = fixture.debugElement.query(By.css('.publish-row'));
+    expect(viewEl).toBeTruthy();
+
+    component.mode = 'update';
+    fixture.detectChanges();
+    const updateEl = fixture.debugElement.query(By.css('.publish-row'));
+    expect(updateEl).toBeFalsy();
+
+    component.mode = 'create';
+    fixture.detectChanges();
+    const createEl = fixture.debugElement.query(By.css('.publish-row'));
+    expect(createEl).toBeFalsy();
+  });
+  it('should have publish-btn and edit-btn on the HTML', () => {
+    component.mode = 'view';
+    component.isAuthor = true;
+    fixture.detectChanges();
+    const publishBtn = fixture.debugElement.query(By.css('.publish-btn'));
+    expect(publishBtn).toBeTruthy();
+    expect(publishBtn.nativeElement.classList).toContain('main-btn');
+    expect(publishBtn.nativeElement.getAttribute('aria-label')).toEqual('Publish');
+    expect(publishBtn.nativeElement.innerText).toEqual('Publish');
+
+    const editBtn = fixture.debugElement.query(By.css('.edit-btn'));
+    expect(editBtn).toBeTruthy();
+    expect(editBtn.nativeElement.classList).toContain('sub-btn');
+    expect(editBtn.nativeElement.getAttribute('aria-label')).toEqual('Edit');
+    expect(editBtn.nativeElement.innerText).toEqual('Edit');
+  });
+  it('should not show publish-row when user is not the author', () => {
+    component.isAuthor = false;
+    component.mode = 'view';
+    fixture.detectChanges();
+    const el = fixture.debugElement.query(By.css('.publish-row'));
+    expect(el).toBeFalsy();
+  });
+  it('should bind the onEdit function to the edit-btn', () => {
+    component.mode = 'view';
+    component.isAuthor = true;
+    fixture.detectChanges();
+    const fnc = spyOn(component, 'onEdit');
+    const btn = fixture.debugElement.query(By.css('.edit-btn'));
+    btn.triggerEventHandler('click', null);
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should bind the onPublished function to the publish-btn', () => {
+    component.mode = 'view';
+    component.isAuthor = true;
+    fixture.detectChanges();
+    const fnc = spyOn(component, 'onPublished');
+    const btn = fixture.debugElement.query(By.css('.publish-btn'));
+    btn.triggerEventHandler('click', null);
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should not show publish-btn if publishedDate is not null', () => {
+    component.mode = 'view';
+    component.isAuthor = true;
+    const publishCtrl = component.form.get('publishedDate');
+    publishCtrl.setValue(null);
+    fixture.detectChanges();
+    const btn = fixture.debugElement.query(By.css('.publish-btn'));
+    expect(btn).toBeTruthy();
+
+    publishCtrl.setValue('2020/09/26');
+    fixture.detectChanges();
+    const updatedBtn = fixture.debugElement.query(By.css('.publish-btn'));
+    expect(updatedBtn).toBeFalsy();
+  });
+
+  /**
+   * onEdit related tests
+   */
+  it('should have a function called onEdit', () => {
+    expect(component.onEdit).toBeDefined();
+  });
+  it('should enable form when onEdit is called', () => {
+    component.form.disable();
+    fixture.detectChanges();
+    component.onEdit();
+    fixture.detectChanges();
+    expect(component.form.disabled).toBeFalsy();
+  });
+  it('should change location to update mode when onEdit is called', () => {
+    component.vocabId = 1;
+    const fnc = spyOn(location as Location, 'go');
+    component.onEdit();
+    expect(fnc).toHaveBeenCalledWith(`/vocab/update/1`);
+  });
+  it('should set mode to update mode when onEdit is called', () => {
+    component.mode = 'view';
+    component.vocabId = 1;
+    fixture.detectChanges();
+    component.onEdit();
+    fixture.detectChanges();
+    expect(component.mode).toEqual('update');
+  });
+
+  /**
+   * onPublish related tests
+   */
+  it('should have a function called onPublished', () => {
+    expect(component.onPublished).toBeTruthy();
+  });
+  it('should call putVocabStatus of VocabService when onPublished is called', () => {
+    const fnc = spyOn(mockVocabService, 'putVocabStatus').and.callFake(() => {
+      return of({});
+    });
+    component.onPublished();
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should show loading when onPublished is called and hide when API returns', fakeAsync(() => {
+    const showFnc = spyOn(mockLoadingService, 'show');
+    const hideFnc = spyOn(mockLoadingService, 'hide');
+    component.onPublished();
+    expect(showFnc).toHaveBeenCalledWith('Publishing...');
+    tick();
+    expect(hideFnc).toHaveBeenCalled();
+  }));
+  it('should update publishedDate after onPublished is called and API returns', fakeAsync(() => {
+    component.vocabId = 1;
+    fixture.detectChanges();
+    mockVocabService.putVocabStatus = () => {
+      return http.put(`${API.VOCABS}/status/1`, 'published');
+    };
+    component.onPublished();
+    const mockRequest = mockHttp.expectOne(`${API.VOCABS}/status/1`);
+    const mockPublishedDate = '2020/09/26';
+    mockRequest.flush({
+      id: 1,
+      status: 'published',
+      publishedDate: mockPublishedDate
+    });
+    mockHttp.verify();
+    tick();
+    const publishedCtrl = component.form.get('publishedDate');
+    expect(publishedCtrl.value).toEqual(mockPublishedDate);
+    const formattedPublishedCtrl = component.form.get('_publishedDate');
+    expect(formattedPublishedCtrl.value).toEqual(moment(mockPublishedDate).format('MMM DD, YYYY'));
+  }));
+  it('should clear out publishedDate and _publishedDate when API returns error', fakeAsync(() => {
+    component.vocabId = 1;
+    fixture.detectChanges();
+    mockVocabService.putVocabStatus = () => {
+      return http.put(`${API.VOCABS}/status/1`, 'published');
+    };
+    component.onPublished();
+    const publishCtrl = component.form.get('publishedDate');
+    const formattedCtrl = component.form.get('_publishedDate');
+    publishCtrl.setValue('2020/09/26');
+    formattedCtrl.setValue(moment('2020/09/26').format('MMM DD, YYYY'));
+    fixture.detectChanges();
+
+    mockVocabService.putVocabStatus = () => {
+      return http.put(`${API.VOCABS}/status/1`, 'published');
+    };
+    const mockRequest = mockHttp.expectOne(`${API.VOCABS}/status/1`);
+    mockRequest.flush({}, { status: 400, statusText: '' });
+    mockHttp.verify();
+    tick();
+    fixture.detectChanges();
+    expect(publishCtrl.value).toBeNull();
+    expect(formattedCtrl.value).toBeNull();
   }));
 });

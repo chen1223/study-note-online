@@ -54,13 +54,27 @@ export class VocabService {
     return this.http.get(url);
   }
 
+  /**
+   * Create vocab pack
+   */
   postVocab(body): Observable<object> {
     const url = API.VOCABS;
     return this.http.post(url, body);
   }
 
+  /**
+   * Update vocab pack
+   */
   patchVocab(id, body): Observable<object> {
     const url = `${API.VOCABS}/${id}`;
     return this.http.patch(url, body);
+  }
+
+  /**
+   * Update vocab pack status
+   */
+  putVocabStatus(id, status): Observable<object> {
+    const url = `${API.VOCABS}/status/${id}`;
+    return this.http.put(url, { status });
   }
 }

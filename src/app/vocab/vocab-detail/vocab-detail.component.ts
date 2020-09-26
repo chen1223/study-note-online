@@ -1,3 +1,4 @@
+import { LoadingService } from './../../share/loading.service';
 import { FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
 import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
 import { Location, isPlatformBrowser } from '@angular/common';
@@ -29,6 +30,7 @@ export class VocabDetailComponent implements OnInit {
   // view / update / create
   mode: string;
   title: string;
+  vocabData;
 
   /**
    * Presentation mode:
@@ -45,11 +47,14 @@ export class VocabDetailComponent implements OnInit {
 
   isBrowser: boolean;
 
+  isVocabLoaded = false;
+  isAuthor = false;
+
   constructor(public readonly location: Location,
               public readonly fb: FormBuilder,
               public vocabService: VocabService,
               public readonly activatedRoute: ActivatedRoute,
-              private loginService: LoginService,
+              private loadingService: LoadingService,
               private router: Router,
               @Inject(PLATFORM_ID) platformId: Object) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -100,33 +105,49 @@ export class VocabDetailComponent implements OnInit {
   }
 
   /**
+   * Load data and init form
+   */
+  initForm(): void {
+    this.isAuthor = this.vocabData.isAuthor;
+
+    // Format publishedDate
+    const publishedDateKey = 'publishedDate';
+    this.vocabData._publishedDate =
+      this.vocabData[publishedDateKey] ? moment(new Date(this.vocabData[publishedDateKey])).format('MMM DD, YYYY') : '';
+
+    // Set profile picture
+    this.vocabData.author.profilePic = this.vocabData.author.picture;
+    this.form.patchValue(this.vocabData);
+    (this.form.get('vocabs') as FormArray).clear();
+    this.title = this.form.get('title').value;
+    const vocabs = this.vocabData.vocabs;
+    if (vocabs) {
+      vocabs.forEach(vocab => {
+        this.addVocab(false, vocab);
+      });
+    }
+  }
+
+  /**
    * Get vocab data from API
    */
   getVocab(id): void {
     // Reset form
     this.resetForm();
+    this.loadingService.show();
     this.vocabService.getVocabPack(id)
         .subscribe(
-          res => {
-            console.log('form before', this.form);
-
-            // Format publishedDate
-            const publishedDateKey = 'publishedDate';
-            res['_publishedDate'] = res[publishedDateKey] ? moment(new Date(res[publishedDateKey])).format('MMM DD, YYYY') : '';
-
-            // Set profile picture
-            res['author']['profilePic'] = res['author']['picture'];
-            this.form.patchValue(res);
-            (this.form.get('vocabs') as FormArray).clear();
-            this.title = this.form.get('title').value;
-            const vocabs = res['vocabs'];
-            if (vocabs) {
-              vocabs.forEach(vocab => {
-                this.addVocab(false, vocab);
-              });
-            }
+          (res: any) => {
+            this.loadingService.hide();
+            this.isVocabLoaded = true;
+            this.vocabData = res;
+            this.initForm();
           },
-          err => {}
+          err => {
+            this.loadingService.hide();
+            this.isVocabLoaded = false;
+            this.router.navigateByUrl('');
+          }
         );
   }
 
@@ -144,7 +165,8 @@ export class VocabDetailComponent implements OnInit {
   addVocab(focus = true, data?): void {
     console.log('addVocab');
     const group = this.fb.group({
-      vocab: ['', [Validators.required]],
+      id: [''],
+      name: ['', [Validators.required]],
       desc: ['', [Validators.required]],
       frontOnTop: [true]
     });
@@ -175,6 +197,37 @@ export class VocabDetailComponent implements OnInit {
    */
   onSave(): void {
     console.log('on save');
+  }
+
+  /**
+   * On user clicks on the edit button
+   */
+  onEdit(): void {
+    this.mode = 'update';
+    this.form.enable();
+    this.location.go(`/vocab/update/${this.vocabId}`);
+  }
+
+  /**
+   * On user clicks on the publish button
+   */
+  onPublished(): void {
+    this.loadingService.show('Publishing...');
+    this.vocabService.putVocabStatus(this.vocabId, 'published')
+        .subscribe(
+          (res: any) => {
+            this.loadingService.hide();
+            const publishedDate = res.publishedDate;
+            const formattedDate = res.publishedDate ? moment(res.publishedDate).format('MMM DD, YYYY') : '';
+            this.form.get('publishedDate').setValue(publishedDate);
+            this.form.get('_publishedDate').setValue(formattedDate);
+          },
+          err => {
+            this.loadingService.hide();
+            this.form.get('publishedDate').reset();
+            this.form.get('_publishedDate').reset();
+          }
+        );
   }
 
   back(): void {
@@ -209,7 +262,14 @@ export class VocabDetailComponent implements OnInit {
    * On cancel click
    */
   onCancel(): void {
-
+    if (this.mode === 'create') {
+      this.router.navigateByUrl('');
+    } else if (this.mode === 'update') {
+      this.initForm();
+      this.mode = 'view';
+      this.form.disable();
+      this.location.go(`/vocab/view/${this.vocabId}`);
+    }
   }
 
   /**
@@ -237,13 +297,13 @@ export class VocabDetailComponent implements OnInit {
     }
     for (let i = 0; i < vocabArrays.length; i++) {
       const vocabGroup = vocabArrays.at(i);
-      const vocab = vocabGroup.get('vocab');
+      const name = vocabGroup.get('name');
       const desc = vocabGroup.get('desc');
-      if (vocab.valid && desc.valid) {
+      if (name.valid && desc.valid) {
         atLeastOneValid = true;
         break;
-      } else if (vocab.invalid) {
-        const vocabCtrl = document.querySelectorAll('input.vocab')[i] as HTMLInputElement;
+      } else if (name.invalid) {
+        const vocabCtrl = document.querySelectorAll('input.name')[i] as HTMLInputElement;
         vocabCtrl.focus();
       } else if (desc.invalid) {
         const descCtrl = document.querySelectorAll('textarea.desc')[i] as HTMLTextAreaElement;
@@ -264,15 +324,23 @@ export class VocabDetailComponent implements OnInit {
     }
     const body = this.form.getRawValue();
     const apiCall = this.mode === 'create' ? this.vocabService.postVocab(body) : this.vocabService.patchVocab(this.vocabId, body);
+    this.loadingService.show('Saving your vocabularies...');
     apiCall.subscribe(
-      res => {
+      (res: any) => {
+        this.loadingService.hide();
+        this.vocabData = res;
+        this.isVocabLoaded = true;
+        this.vocabId = res.id;
+        this.initForm();
         console.log('Vocab save response', res);
         const idKey = 'id';
         const packId = res[idKey];
         // TODO: Show successful message
-        this.router.navigateByUrl(`/vocab/view/${packId}`);
+        this.location.go(`/vocab/view/${packId}`);
+        this.mode = 'view';
       },
       err => {
+        this.loadingService.hide();
         console.log('Vocab save error', err);
       }
     );

@@ -1,0 +1,28 @@
+<!-- Dialog header -->
+<div class="dialog-header">
+    <h2 class="dialog-title">{{ title }}</h2>
+  </div><!-- End of dialog header -->
+  <!-- Dialog Body -->
+  <mat-dialog-content>
+    <div class="dialog-body">
+      <figure class="brand-icon">
+        <img class="__icon" src="/assets/img/cap.png">
+      </figure>
+      <div class="loading-wrapper">
+        <figure class="dot">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </figure>
+      </div>
+      <div class="quote-wrapper">
+        <span class="quote">{{ selectedQuote?.line }}</span>
+      </div><!-- End of quote wrapper -->
+      <div class="author-wrapper">
+        <span *ngIf="selectedQuote?.author" class="author">{{ selectedQuote?.author }}</span>
+      </div>
+    </div><!-- End of dialog body -->
+  </mat-dialog-content>
+
+

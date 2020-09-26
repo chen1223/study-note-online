@@ -7,6 +7,7 @@ import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { LoginService } from './login.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { QuoteService } from 'src/app/share/quote.service';
 
 class MockLoginService {
   login(fbid, email, name) {
@@ -23,6 +24,7 @@ describe('LoginDialogComponent', () => {
   let fixture: ComponentFixture<LoginDialogComponent>;
   let quote;
   let mockLoginService: LoginService;
+  let quoteService: QuoteService;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
@@ -33,6 +35,7 @@ describe('LoginDialogComponent', () => {
         HttpClientTestingModule
       ],
       providers: [
+        { provide: QuoteService },
         { provide: LoginService, useClass: MockLoginService },
         { provide: MatDialogRef, useClass: MockMatDialogRef }
       ]
@@ -44,6 +47,7 @@ describe('LoginDialogComponent', () => {
     fixture = TestBed.createComponent(LoginDialogComponent);
     component = fixture.componentInstance;
     mockLoginService = TestBed.inject(LoginService);
+    quoteService = TestBed.inject(QuoteService);
     fixture.detectChanges();
     quote = {
       line: 'An apple a day, keeps a doctor away.',
@@ -61,33 +65,10 @@ describe('LoginDialogComponent', () => {
   });
 
   /**
-   * Random quote related tests
-   */
-  it('should contain an array of quotes', () => {
-    expect(component.quotes).toBeTruthy();
-    expect(component.quotes.length).toBeGreaterThan(0);
-  });
-  it('should define a function that return quotes randomly - randomQuotes', () => {
-    expect(component.randomQuotes).toBeTruthy();
-    const output = component.randomQuotes();
-    fixture.detectChanges();
-    expect(output).toBeInstanceOf(Object);
-  });
-
-  /**
    * Quote related tests
    */
   it('should have property: selectedQuote', () => {
     expect(component.selectedQuote).toBeDefined();
-  });
-  it('should call randomQuotes function to set selectedQuote on ngInit', () => {
-    expect(component.selectedQuote).toBeDefined();
-    const fnc = spyOn(component, 'randomQuotes');
-
-    component.ngOnInit();
-
-    expect(fnc).toHaveBeenCalled();
-    expect(component.selectedQuote).not.toBeNull();
   });
   it('should show quote on HTML', () => {
     // Test if the css class 'quote' can be found on the HTML
@@ -111,6 +92,25 @@ describe('LoginDialogComponent', () => {
     fixture.detectChanges();
     const authorEl = fixture.debugElement.query(By.css('.author'));
     expect(authorEl).toBeFalsy();
+  });
+  it('should call getQuote from QuoteService on ngOnInit', () => {
+    const fnc = spyOn(quoteService, 'getQuote');
+    component.ngOnInit();
+    expect(fnc).toHaveBeenCalled();
+  });
+  it('should save quote to selectedQuote when getQuote is called', () => {
+    component.selectedQuote = null;
+    fixture.detectChanges();
+    const dummyQuote = {
+      line: '123',
+      author: 'John Doe'
+    };
+    spyOn(quoteService, 'getQuote').and.callFake(() => {
+      return dummyQuote;
+    });
+    component.ngOnInit();
+    fixture.detectChanges();
+    expect(component.selectedQuote).toEqual(dummyQuote);
   });
 
   /**

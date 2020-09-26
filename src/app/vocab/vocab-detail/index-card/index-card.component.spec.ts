@@ -47,7 +47,7 @@ describe('IndexCardComponent', () => {
    */
   it('should redner front and back for each vocab', () => {
     component.vocabs = new FormArray([new FormGroup({
-      vocab: new FormControl('test'),
+      name: new FormControl('test'),
       desc: new FormControl('123'),
       frontOnTop: new FormControl(true)
     })]);
@@ -64,12 +64,12 @@ describe('IndexCardComponent', () => {
   it('shoud render data on the HTML', () => {
     component.vocabs = new FormArray([
       new FormGroup({
-        vocab: new FormControl('test'),
+        name: new FormControl('test'),
         desc: new FormControl('123'),
         frontOnTop: new FormControl(true)
       }),
       new FormGroup({
-        vocab: new FormControl('book'),
+        name: new FormControl('book'),
         desc: new FormControl('book 123'),
         frontOnTop: new FormControl(true)
       })
@@ -79,9 +79,9 @@ describe('IndexCardComponent', () => {
     expect(cardEls.length).toEqual(component.vocabs.length);
     // Test content
     cardEls.forEach(el => {
-      const vocab = el.query(By.css('.vocab'));
+      const name = el.query(By.css('.name'));
       const desc = el.query(By.css('.desc'));
-      expect(vocab).toBeTruthy();
+      expect(name).toBeTruthy();
       expect(desc).toBeTruthy();
     });
   });
@@ -91,7 +91,7 @@ describe('IndexCardComponent', () => {
    */
   it('should render flip button on the HTML', () => {
     component.vocabs = new FormArray([new FormGroup({
-      vocab: new FormControl('test'),
+      name: new FormControl('test'),
       desc: new FormControl('123'),
       frontOnTop: new FormControl(true)
     })]);
@@ -106,7 +106,7 @@ describe('IndexCardComponent', () => {
   it('should bind flipCard function to the flip button', () => {
     expect(component.flipCard).toBeDefined();
     component.vocabs = new FormArray([new FormGroup({
-      vocab: new FormControl('test'),
+      name: new FormControl('test'),
       desc: new FormControl('123'),
       frontOnTop: new FormControl(true)
     })]);
@@ -118,7 +118,7 @@ describe('IndexCardComponent', () => {
   });
   it('should flip the card at specified index on flipCard called', () => {
     component.vocabs = new FormArray([new FormGroup({
-      vocab: new FormControl('test'),
+      name: new FormControl('test'),
       desc: new FormControl('123'),
       frontOnTop: new FormControl(true)
     })]);
@@ -135,12 +135,12 @@ describe('IndexCardComponent', () => {
   it('should have remove button on each card', () => {
     component.vocabs = new FormArray([
       new FormGroup({
-        vocab: new FormControl('test'),
+        name: new FormControl('test'),
         desc: new FormControl('123'),
         frontOnTop: new FormControl(true)
       }),
       new FormGroup({
-        vocab: new FormControl('book'),
+        name: new FormControl('book'),
         desc: new FormControl('book 123'),
         frontOnTop: new FormControl(true)
       })
@@ -178,12 +178,12 @@ describe('IndexCardComponent', () => {
     const vocab2Title = 'vocab2';
     component.vocabs = new FormArray([
       new FormGroup({
-        vocab: new FormControl(vocab1Title),
+        name: new FormControl(vocab1Title),
         desc: new FormControl('123'),
         frontOnTop: new FormControl(true)
       }),
       new FormGroup({
-        vocab: new FormControl(vocab2Title),
+        name: new FormControl(vocab2Title),
         desc: new FormControl('book 123'),
         frontOnTop: new FormControl(true)
       })
@@ -193,13 +193,13 @@ describe('IndexCardComponent', () => {
     fixture.detectChanges();
     const vocabArray = component.vocabs as FormArray;
     expect(vocabArray.length).toBe(1);
-    const remainingVocabTitle = vocabArray.at(0).get('vocab').value;
+    const remainingVocabTitle = vocabArray.at(0).get('name').value;
     expect(remainingVocabTitle).toBe(vocab2Title);
   });
   it('should not show remove button when there is only 1 card left', () => {
     component.vocabs = new FormArray([
       new FormGroup({
-        vocab: new FormControl('vocab1'),
+        name: new FormControl('vocab1'),
         desc: new FormControl('123'),
         frontOnTop: new FormControl(true)
       })
@@ -211,12 +211,12 @@ describe('IndexCardComponent', () => {
   it('should not show remove button in view mode', () => {
     component.vocabs = new FormArray([
       new FormGroup({
-        vocab: new FormControl('vocab1'),
+        name: new FormControl('vocab1'),
         desc: new FormControl('123'),
         frontOnTop: new FormControl(true)
       }),
       new FormGroup({
-        vocab: new FormControl('vocab1'),
+        name: new FormControl('vocab1'),
         desc: new FormControl('123'),
         frontOnTop: new FormControl(true)
       })
@@ -280,12 +280,12 @@ describe('IndexCardComponent', () => {
   it('should prepare correct initial carousel list', () => {
     component.vocabs = new FormArray([
       new FormGroup({
-        vocab: new FormControl('vocab1'),
+        name: new FormControl('vocab1'),
         desc: new FormControl('123'),
         frontOnTop: new FormControl(true)
       }),
       new FormGroup({
-        vocab: new FormControl('vocab2'),
+        name: new FormControl('vocab2'),
         desc: new FormControl('234'),
         frontOnTop: new FormControl(true)
       })
@@ -347,7 +347,7 @@ describe('IndexCardComponent', () => {
     component.presentationMode = true;
     component.vocabs = new FormArray([
       new FormGroup({
-        vocab: new FormControl('vocab1'),
+        name: new FormControl('vocab1'),
         desc: new FormControl('123'),
         frontOnTop: new FormControl(true)
       }),
@@ -364,17 +364,17 @@ describe('IndexCardComponent', () => {
     component.prevIndex = 2;
     component.vocabs = new FormArray([
       new FormGroup({
-        vocab: new FormControl('vocab1'),
+        name: new FormControl('vocab1'),
         desc: new FormControl('123'),
         frontOnTop: new FormControl(true)
       }),
       new FormGroup({
-        vocab: new FormControl('vocab2'),
+        name: new FormControl('vocab2'),
         desc: new FormControl('123'),
         frontOnTop: new FormControl(true)
       }),
       new FormGroup({
-        vocab: new FormControl('vocab3'),
+        name: new FormControl('vocab3'),
         desc: new FormControl('123'),
         frontOnTop: new FormControl(true)
       }),
@@ -392,17 +392,17 @@ describe('IndexCardComponent', () => {
     component.prevIndex = 2;
     component.vocabs = new FormArray([
       new FormGroup({
-        vocab: new FormControl('vocab1'),
+        name: new FormControl('vocab1'),
         desc: new FormControl('123'),
         frontOnTop: new FormControl(true)
       }),
       new FormGroup({
-        vocab: new FormControl('vocab2'),
+        name: new FormControl('vocab2'),
         desc: new FormControl('123'),
         frontOnTop: new FormControl(true)
       }),
       new FormGroup({
-        vocab: new FormControl('vocab3'),
+        name: new FormControl('vocab3'),
         desc: new FormControl('123'),
         frontOnTop: new FormControl(true)
       }),

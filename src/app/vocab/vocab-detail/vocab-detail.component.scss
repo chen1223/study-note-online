@@ -1,5 +1,5 @@
-@import '../../share/controls.scss';
-@import '../../share/variable.scss';
+@import '../../share/scss/controls.scss';
+@import '../../share/scss/variable.scss';
 
 .main-content {
   margin: 2em 0;
@@ -11,6 +11,14 @@
 }
 .ctrl-wrapper {
   margin-bottom: 2em;
+}
+/** Publish row **/
+.publish-row {
+  text-align: right;
+  margin-bottom: 1rem;
+  .publish-btn, .edit-btn {
+    margin-left: 1rem;
+  }
 }
 /** Mode button **/
 .mode-row {
