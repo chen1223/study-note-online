@@ -1,4 +1,4 @@
-import { LoadingService } from './../../share/loading.service';
+import { LoadingService } from './../../share/services/loading.service';
 import { FormBuilder, Validators, FormControl, FormArray } from '@angular/forms';
 import { Component, OnInit, PLATFORM_ID, Inject } from '@angular/core';
 import { Location, isPlatformBrowser } from '@angular/common';
@@ -56,7 +56,7 @@ export class VocabDetailComponent implements OnInit {
               public readonly activatedRoute: ActivatedRoute,
               private loadingService: LoadingService,
               private router: Router,
-              @Inject(PLATFORM_ID) platformId: Object) {
+              @Inject(PLATFORM_ID) platformId: object) {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 

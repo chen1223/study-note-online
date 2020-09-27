@@ -2,7 +2,7 @@ import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { LoadingDialogComponent } from './loading-dialog.component';
-import { QuoteService } from '../quote.service';
+import { QuoteService } from '../services/quote.service';
 
 describe('LoadingDialogComponent', () => {
   let component: LoadingDialogComponent;

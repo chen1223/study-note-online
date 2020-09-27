@@ -16,8 +16,8 @@ import { IndexCardComponent } from './index-card/index-card.component';
 import { VocabService } from './../vocab.service';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
 import * as moment from 'moment';
-import { LoadingService } from 'src/app/share/loading.service';
 import { Location } from '@angular/common';
+import { LoadingService } from './../../share/services/loading.service';
 
 const dummyVocabData = {
   id: 1,

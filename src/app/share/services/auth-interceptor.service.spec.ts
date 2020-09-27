@@ -1,11 +1,11 @@
-import { API_ENDPOINT } from './../../environments/environment';
+import { API_ENDPOINT } from './../../../environments/environment';
 import { TestBed } from '@angular/core/testing';
 
 import { AuthInterceptorService } from './auth-interceptor.service';
-import { LoginService } from '../core/login-dialog/login.service';
+import { LoginService } from '../../core/login-dialog/login.service';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { HTTP_INTERCEPTORS, HttpClient } from '@angular/common/http';
-import { VocabService } from '../vocab/vocab.service';
+import { VocabService } from '../../vocab/vocab.service';
 
 class MockLoginService {
   userObj = {

@@ -7,7 +7,7 @@ import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 import { LoginService } from './login.service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { QuoteService } from 'src/app/share/quote.service';
+import { QuoteService } from '../../share/services/quote.service';
 
 class MockLoginService {
   login(fbid, email, name) {

@@ -1,0 +1,49 @@
+@import '../../scss/variable.scss';
+
+.msg-queue-container {
+  position: fixed;
+  right: 1rem;
+  margin-left: 1rem;
+  top: calc(70px + 1rem);
+  z-index: 2000;
+}
+.msg-wrapper {
+  position: fixed;
+  right: 1rem;
+}
+.msg {
+  padding: 1rem;
+  color: white;
+  border-radius: 10px;
+  position: relative;
+  display: table;
+  margin-left: auto;
+  margin-bottom: .5rem;
+  transition: all .3s;
+  &.--success {
+    background: $green;
+  }
+  &.--info {
+    background: $blue;
+  }
+  &.--warning {
+    background: $orange;
+    padding-right: 2.25rem;
+  }
+  &.--error {
+    background: $red;
+    padding-right: 2.25rem;
+  }
+  .text {
+    font-size: 1rem;
+  }
+}
+.close-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  position: absolute;
+  top: .5rem;
+  right: .5rem;
+}

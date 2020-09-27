@@ -22,12 +22,13 @@ import { ShareModule } from './share/share.module';
 import { SweetAlert2Module } from '@sweetalert2/ngx-sweetalert2';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { AuthInterceptorService } from './share/auth-interceptor.service';
+import { AuthInterceptorService } from './share/services/auth-interceptor.service';
+import { MessageModule } from './share/message/message.module';
 
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
   ],
   imports: [
     BrowserModule,
@@ -36,7 +37,8 @@ import { AuthInterceptorService } from './share/auth-interceptor.service';
     CoreModule,
     SweetAlert2Module.forRoot(),
     BrowserAnimationsModule,
-    HttpClientModule
+    HttpClientModule,
+    MessageModule
   ],
   providers: [
     {

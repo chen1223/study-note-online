@@ -1,4 +1,4 @@
-import { Quote, QuoteService } from './../../share/quote.service';
+import { Quote, QuoteService } from './../../share/services/quote.service';
 import { Component, OnInit, NgZone } from '@angular/core';
 import { LoginService } from './login.service';
 import { MatDialogRef } from '@angular/material/dialog';

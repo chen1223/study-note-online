@@ -1,0 +1,20 @@
+<!-- Message queue container -->
+<div class="msg-queue-container">
+  <div class="msg-wrapper"
+    *ngFor="let msg of messageService.getMsgs()"
+    #msgItems>
+    <div class="msg"
+          [@alertState]
+          [ngClass]="{
+            '--success': msg.type === 'success',
+            '--info': msg.type === 'info',
+            '--warning': msg.type === 'warning',
+            '--error': msg.type === 'error'
+          }">
+      <span class="text">{{ msg.msg }}</span>
+      <button *ngIf="msg.type === 'warning' || msg.type === 'error'" class="close-btn" aria-label="Close message" type="button">
+        <fa-icon class="__icon" [icon]="['fa', 'times']" aria-label="remove card"></fa-icon>
+      </button>
+    </div>
+  </div>
+</div><!-- End of message queue container -->
